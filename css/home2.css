@@ -1,0 +1,689 @@
+/* ============================================================
+   inicio.css — Estilos de la página de inicio del usuario
+   Carpeta: css/inicio.css
+   ============================================================ */
+
+/* ---- Reset y base ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --gold:        #C9A96E;
+  --gold-dark:   #b8935a;
+  --navy:        #0D1B2A;
+  --navy-deep:   #081422;
+  --navy-mid:    #0f2436;
+  --white-60:    rgba(255, 255, 255, 0.60);
+  --white-40:    rgba(255, 255, 255, 0.40);
+  --white-10:    rgba(255, 255, 255, 0.10);
+  --white-05:    rgba(255, 255, 255, 0.05);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Jost', sans-serif;
+  background-color: var(--navy);
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+/* Tipografía serif */
+.serif,
+h1, h2, h3 {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: rgba(13, 27, 42, 0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--white-10);
+}
+
+.navbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+/* --- Logo --- */
+.navbar-logo {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logo-img {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.logo-fallback {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-icon {
+  color: var(--gold);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 300;
+  letter-spacing: 0.35em;
+  color: #ffffff;
+}
+
+/* --- Menú central --- */
+.navbar-menu {
+  display: none;
+  list-style: none;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white-60);
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.nav-link:hover,
+.nav-link--active {
+  color: #ffffff;
+  border-bottom-color: var(--gold);
+}
+
+/* --- Acciones (derecha) --- */
+.navbar-actions {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.nav-username {
+  font-size: 0.8rem;
+  color: var(--white-40);
+  letter-spacing: 0.05em;
+}
+
+.nav-username::before {
+  content: 'Hola, ';
+  color: var(--white-40);
+}
+
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: transparent;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+}
+
+.btn-logout:hover {
+  background-color: rgba(239, 68, 68, 0.10);
+  border-color: #f87171;
+  color: #f87171;
+}
+
+/* --- Hamburguesa (móvil) --- */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background-color: #ffffff;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* --- Menú móvil desplegable --- */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  border-top: 1px solid var(--white-10);
+  background-color: var(--navy-deep);
+  padding: 0.5rem 0;
+}
+
+.mobile-menu.open {
+  display: flex;
+}
+
+.mobile-link {
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--white-60);
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid var(--white-05);
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.mobile-link:hover {
+  color: #ffffff;
+  background-color: var(--white-05);
+}
+
+.mobile-link--logout {
+  color: #fca5a5;
+  margin-top: 0.25rem;
+}
+
+/* ============================================================
+   HERO — Bienvenida personalizada
+   ============================================================ */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 7rem 1.5rem 4rem;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1800&q=80');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 27, 42, 0.55) 0%,
+    rgba(13, 27, 42, 0.25) 50%,
+    rgba(13, 27, 42, 0.80) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+  animation: fadeUp 0.8s ease forwards;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 300;
+  line-height: 1.05;
+  color: #ffffff;
+  margin-bottom: 1.25rem;
+}
+
+.hero-name {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: var(--white-60);
+  font-weight: 300;
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+}
+
+/* Botones hero */
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.8rem 2.2rem;
+  background-color: var(--gold);
+  color: var(--navy);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--gold-dark);
+}
+
+.btn-secondary {
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.8rem 2.2rem;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 400;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: var(--gold);
+  color: var(--navy);
+}
+
+/* ============================================================
+   UTILIDADES DE SECCIÓN
+   ============================================================ */
+.section-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.section-tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.6rem;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  color: #ffffff;
+}
+
+/* ============================================================
+   SECCIÓN SERVICIOS
+   ============================================================ */
+.section-servicios {
+  padding: 6rem 0;
+  background-color: var(--navy);
+}
+
+.servicios-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.servicio-card {
+  background-color: var(--white-05);
+  border: 1px solid var(--white-10);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.servicio-card:hover {
+  border-color: rgba(201, 169, 110, 0.45);
+  transform: translateY(-4px);
+}
+
+.servicio-img-wrap {
+  height: 180px;
+  overflow: hidden;
+}
+
+.servicio-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s;
+}
+
+.servicio-card:hover .servicio-img {
+  transform: scale(1.07);
+}
+
+.servicio-body {
+  padding: 1.4rem;
+}
+
+.servicio-icon {
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
+.servicio-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 300;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.servicio-desc {
+  font-size: 0.82rem;
+  color: var(--white-60);
+  line-height: 1.65;
+}
+
+/* ============================================================
+   SECCIÓN HABITACIONES
+   ============================================================ */
+.section-habitaciones {
+  padding: 6rem 0;
+  background-color: var(--navy-deep);
+}
+
+.habitaciones-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.hab-card {
+  background-color: rgba(15, 36, 54, 0.70);
+  border: 1px solid var(--white-10);
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.hab-card:hover {
+  border-color: rgba(201, 169, 110, 0.50);
+  transform: translateY(-4px);
+}
+
+.hab-img-wrap {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.hab-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s;
+}
+
+.hab-card:hover .hab-img {
+  transform: scale(1.06);
+}
+
+.hab-tipo {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  background-color: var(--gold);
+  color: var(--navy);
+  padding: 0.25rem 0.7rem;
+  font-weight: 500;
+}
+
+.hab-body {
+  padding: 1.4rem;
+}
+
+.hab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+}
+
+.hab-nombre {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: #ffffff;
+}
+
+.hab-precio-wrap {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.hab-desde {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--white-40);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hab-precio {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.hab-noche {
+  font-size: 0.7rem;
+  color: var(--white-40);
+}
+
+.hab-detalle {
+  font-size: 0.82rem;
+  color: var(--white-60);
+  line-height: 1.65;
+  margin-bottom: 1.25rem;
+}
+
+.hab-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.hab-badge {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid;
+}
+
+.hab-badge--ok {
+  border-color: rgba(74, 222, 128, 0.35);
+  color: #4ade80;
+}
+
+.hab-badge--no {
+  border-color: rgba(248, 113, 113, 0.35);
+  color: #f87171;
+}
+
+.btn-reservar {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  background: transparent;
+  padding: 0.45rem 1.2rem;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-reservar:hover {
+  background-color: var(--gold);
+  color: var(--navy);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer {
+  border-top: 1px solid var(--white-10);
+  padding: 2rem 1.5rem;
+  background-color: var(--navy);
+}
+
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-copy {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--white-40);
+}
+
+.footer-logout {
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(252, 165, 165, 0.55);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-logout:hover {
+  color: #f87171;
+}
+
+/* ============================================================
+   RESPONSIVE — Tablet (768px+)
+   ============================================================ */
+@media (min-width: 768px) {
+
+  /* Navbar */
+  .hamburger       { display: none; }
+  .mobile-menu     { display: none !important; }
+  .navbar-menu     { display: flex; }
+  .navbar-actions  { display: flex; }
+
+  /* Servicios: 2 columnas */
+  .servicios-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Habitaciones: 2 columnas */
+  .habitaciones-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Footer en fila */
+  .footer-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — Desktop (1024px+)
+   ============================================================ */
+@media (min-width: 1024px) {
+
+  /* Servicios: 3 columnas */
+  .servicios-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Habitaciones: 4 columnas (2x2) se mantienen, o ponemos 2 */
+  .habitaciones-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+
+  /* Habitaciones: 4 en fila */
+  .habitaciones-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
