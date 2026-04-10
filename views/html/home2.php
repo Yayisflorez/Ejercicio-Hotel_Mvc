@@ -8,9 +8,10 @@ session_start();
 
 
 // Datos del usuario desde la sesión (cargados al hacer login desde BD)
-$nombre   = htmlspecialchars($_SESSION['usuario_nombre']   ?? 'Huésped');
-$apellido = htmlspecialchars($_SESSION['usuario_apellido'] ?? '');
-$email    = htmlspecialchars($_SESSION['usuario_email']    ?? '');
+
+$nombre = htmlspecialchars($_SESSION['usuario']['nombre'] ?? 'Huésped');
+$apellido = htmlspecialchars($_SESSION['usuario']['apellido'] ?? '');
+$email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
 ?>
 <!DOCTYPE html>
 <html lang="es">

@@ -10,6 +10,7 @@ session_start();
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/home.css"/>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3179/3179068.png" type="recurso/png"/>
 </head>
 <body class="bg-[#0D1B2A] text-white">
 
@@ -44,7 +45,7 @@ session_start();
   <h1 class="fade-up delay-2 serif text-6xl md:text-8xl font-light leading-tight mb-6">
     Hotel<br/><em>Viña del Mar</em>
   </h1>
-  <p class="fade-up delay-3 text-white/60 text-lg max-w-xl font-light leading-relaxed mb-10">
+  <p class="fade-up delay-3 text-white/100 text-lg max-w-xl font-light leading-relaxed mb-10">
     Un refugio de lujo frente al mar. Donde cada detalle es una experiencia y cada momento, un recuerdo eterno.
   </p>
   <a href="#servicios" class="fade-up delay-3 btn-hero px-10 py-3 text-sm tracking-widest uppercase">
@@ -107,7 +108,7 @@ session_start();
       ['h-64', 'https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=800&q=80'],
       ['h-64', 'https://images.unsplash.com/photo-1444201983204-c43cbd584d93?auto=format&fit=crop&w=800&q=80'],
       ['h-48', 'https://images.unsplash.com/photo-1561501900-3701fa6a0864?auto=format&fit=crop&w=800&q=80'],
-      ['h-48', 'https://images.unsplash.com/photo-1540541338-651a0a2e1e29?auto=format&fit=crop&w=800&q=80'],
+      ['h-48', 'https://hips.hearstapps.com/hmg-prod/images/mejores-hoteles-lujo-europa-israel-jaffa-1663058825.jpeg?crop=0.8886666666666666xw:1xh;center,top&resize=1200:*s'],
       ['h-48', 'https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=800&q=80'],
     ];
     foreach ($fotos as $f): ?>

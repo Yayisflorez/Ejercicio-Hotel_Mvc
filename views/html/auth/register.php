@@ -71,17 +71,17 @@ unset($_SESSION["mensaje"], $_SESSION["tipo"], $_SESSION["errors"], $_SESSION["d
         <!-- Tipo y número de documento -->
         <div class="field-row">
           <div class="field-group">
-            <label class="field-label" for="tipo_doc">Tipo de Doc.</label>
-            <select id="tipo_doc" name="tipo_doc" class="field-input field-select">
-              <option value="">Selecciona</option>
-              <option value="CC"  <?= ($datos['tipo_doc'] ?? '') === 'CC'  ? 'selected' : '' ?>>Cédula (CC)</option>
-              <option value="CE"  <?= ($datos['tipo_doc'] ?? '') === 'CE'  ? 'selected' : '' ?>>Cédula Extranjera (CE)</option>
-              <option value="PA"  <?= ($datos['tipo_doc'] ?? '') === 'PA'  ? 'selected' : '' ?>>Pasaporte (PA)</option>
-              <option value="TI"  <?= ($datos['tipo_doc'] ?? '') === 'TI'  ? 'selected' : '' ?>>Tarjeta de Identidad (TI)</option>
-            </select>
+            <label class="field-label" for="tipo_documento_id">Tipo de Doc.</label>
+           <label class="form-label">tipos de documento</label>
+                    <select class="form-control" name="fav_language" id="">
+                    <?php foreach ($documents as $document): ?>
+                        <option value="<?php echo htmlspecialchars($document['id']); ?>"><?php echo htmlspecialchars($document['nombre']); ?></option>
+                    <?php endforeach; ?>
+                    </select>
+
             <p id="tipoDocError" class="field-error hidden"></p>
-            <?php if (!empty($errores['tipo_doc'])): ?>
-              <p class="field-error"><?= htmlspecialchars($errores['tipo_doc']) ?></p>
+            <?php if (!empty($errores['tipo_documento_id'])): ?>
+              <p class="field-error"><?= htmlspecialchars($errores['tipo_documento_id']) ?></p>
             <?php endif; ?>
           </div>
           <div class="field-group">
@@ -237,7 +237,7 @@ unset($_SESSION["mensaje"], $_SESSION["tipo"], $_SESSION["errors"], $_SESSION["d
     let valid = true;
 
     // Validaciones
-    const tipoDoc = document.getElementById('tipo_doc').value.trim();
+    const tipoDoc = document.getElementById('tipo_documento_id').value.trim();
     const documento = document.getElementById('documento').value.trim();
     const nombre = document.getElementById('nombre').value.trim();
     const apellido = document.getElementById('apellido').value.trim();

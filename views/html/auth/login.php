@@ -64,7 +64,6 @@ unset($_SESSION["mensaje"], $_SESSION["tipo"], $_SESSION["errors"], $_SESSION["d
             id="email"
             type="email"
             name="email"
-            required
             placeholder="correo@ejemplo.com"
             class="field-input"
             value="<?= htmlspecialchars($datos['email'] ?? '') ?>"

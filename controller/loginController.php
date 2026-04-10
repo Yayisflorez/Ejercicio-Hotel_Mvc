@@ -4,8 +4,23 @@ require_once("model/conexion.php");
 class ControllerBase
 {
 
+
     public function verPaginaInicio($pagina)
     {
+        
+        $errors = $_SESSION['errors'] ?? [];
+        $old = $_SESSION['old'] ?? [];
+        $success = $_SESSION['success'] ?? '';
+
+        unset($_SESSION['errors'], $_SESSION['old'], $_SESSION['success']);
+
+        $conexion = new conexion();
+        $conexion->conectar();
+        $sql = "SELECT * FROM documentos";  
+        $conexion->query($sql);
+        $result = $conexion->getConexion();
+        $_SESSION['documentTypes'] = $result->fetch_all(MYSQLI_ASSOC);        
+        $conexion->cerrar();
         include_once $pagina;
     }
 
@@ -22,7 +37,7 @@ class ControllerBase
         $Apellido = trim($_POST['apellido'] ?? '');
         $Email = trim($_POST['email'] ?? '');
         $Telefono = trim($_POST['telefono'] ?? '');
-        $TipoDoc = trim($_POST['tipo_doc'] ?? '');
+        $TipoDocId = (int)($_POST['tipo_documento_id'] ?? 0);
         $Documento = trim($_POST['documento'] ?? '');
         $Contraseña1 = $_POST['password'] ?? '';
         $Contraseña2 = $_POST['confirm_password'] ?? '';
@@ -33,7 +48,7 @@ class ControllerBase
             'apellido' => $Apellido,
             'email' => $Email,
             'telefono' => $Telefono,
-            'tipo_doc' => $TipoDoc,
+            'tipo_documento_id' => $TipoDocId,
             'documento' => $Documento
         ];
 
@@ -47,8 +62,8 @@ class ControllerBase
         if (empty($Apellido)) {
             $errors['apellido'] = "El apellido es obligatorio";
         }
-        if (empty($TipoDoc)) {
-            $errors['tipo_doc'] = "El tipo de documento es obligatorio";
+        if (empty($TipoDocId)) {
+            $errors['tipo_documento_id'] = "El tipo de documento es obligatorio";
         }
         if (empty($Documento)) {
             $errors['documento'] = "El número de documento es obligatorio";
@@ -108,9 +123,9 @@ class ControllerBase
 
         // Insertar usuario
         $passwordHash = password_hash($Contraseña1, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO usuarios (nombre, apellido, email, telefono, tipo_doc, documento, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO usuarios (nombre, apellido, email, telefono, tipo_documento_id, documento, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conexion->prepare($sql);
-        $stmt->bind_param('sssssss', $Nombre, $Apellido, $Email, $Telefono, $TipoDoc, $Documento, $passwordHash);
+        $stmt->bind_param('ssssiss', $Nombre, $Apellido, $Email, $Telefono, $TipoDocId, $Documento, $passwordHash);
         if (!$stmt->execute()) {
             $_SESSION['errors']['db'] = "Error al guardar: " . $stmt->error;
             header("Location: index.php?action=getFormRegisterUser");

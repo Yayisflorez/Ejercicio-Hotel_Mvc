@@ -2,7 +2,9 @@
 
 class conexion
 {
-
+    private $sql; // query a la base de datos
+    private $result; // resultado de la query
+    private $filasAfectadas; // numero de filas afectadas por la query
     private $conexionDb;
 
     public function conectar()
@@ -28,6 +30,15 @@ class conexion
         }
 
 
+    }
+    public function query($sql) {
+        $this->sql = $sql;
+        $this->result = $this->conexionDb->query($sql);
+        if ($this->result === false) {
+            throw new Exception('Query error: ' . $this->conexionDb->error);
+        }
+        $this->filasAfectadas = $this->conexionDb->affected_rows;
+        return $this->result;
     }
 
     public function getConexion(){
