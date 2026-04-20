@@ -5,6 +5,7 @@ $mensaje = $_SESSION["mensaje"] ?? "";
 $tipo = $_SESSION["tipo"] ?? "";
 $errores = $_SESSION["errors"] ?? [];
 $datos = $_SESSION["datos"] ?? [];
+$documents = $_SESSION['documentTypes'] ?? [];
 $usuario = $_SESSION["usuario"] ?? null;
 
 
@@ -20,7 +21,8 @@ unset($_SESSION["mensaje"], $_SESSION["tipo"], $_SESSION["errors"], $_SESSION["d
   <title>Registrarse · Hotel Viña del Mar</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="icon" href="img/recurso.png" type="image/png">
 </head>
 <body>
 
@@ -55,6 +57,11 @@ unset($_SESSION["mensaje"], $_SESSION["tipo"], $_SESSION["errors"], $_SESSION["d
         </div>
       <?php endif; ?>
 
+      <?php if (!empty($errores['db'])): ?>
+        <div class="alert-error">
+          <?= htmlspecialchars($errores['db']) ?>
+        </div>
+      <?php endif; ?>
 
       <br>
       <p class="auth-tag">Únete a nosotros</p>
@@ -71,13 +78,13 @@ unset($_SESSION["mensaje"], $_SESSION["tipo"], $_SESSION["errors"], $_SESSION["d
         <!-- Tipo y número de documento -->
         <div class="field-row">
           <div class="field-group">
-            <label class="field-label" for="tipo_documento_id">Tipo de Doc.</label>
-           <label class="form-label">tipos de documento</label>
-                    <select class="form-control" name="fav_language" id="">
-                    <?php foreach ($documents as $document): ?>
-                        <option value="<?php echo htmlspecialchars($document['id']); ?>"><?php echo htmlspecialchars($document['nombre']); ?></option>
-                    <?php endforeach; ?>
-                    </select>
+            <label class="field-label" for="tipo_documento_id">Tipo de Documento</label>
+            <select class="field-input field-select" name="tipo_documento_id" id="tipo_documento_id" required>
+              <option value="" disabled <?= empty($datos['tipo_documento_id'] ?? '') ? 'selected' : '' ?>>Selecciona un tipo</option>
+              <?php foreach ($documents as $document): ?>
+                <option value="<?php echo htmlspecialchars($document['id']); ?>" <?php echo (isset($datos['tipo_documento_id']) && $datos['tipo_documento_id'] == $document['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($document['tipo']); ?></option>
+              <?php endforeach; ?>
+            </select>
 
             <p id="tipoDocError" class="field-error hidden"></p>
             <?php if (!empty($errores['tipo_documento_id'])): ?>

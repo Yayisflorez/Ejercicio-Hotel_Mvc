@@ -12,14 +12,11 @@ class ControllerBase
         $old = $_SESSION['old'] ?? [];
         $success = $_SESSION['success'] ?? '';
 
-        unset($_SESSION['errors'], $_SESSION['old'], $_SESSION['success']);
-
         $conexion = new conexion();
         $conexion->conectar();
-        $sql = "SELECT * FROM documentos";  
-        $conexion->query($sql);
-        $result = $conexion->getConexion();
-        $_SESSION['documentTypes'] = $result->fetch_all(MYSQLI_ASSOC);        
+        $sql = "SELECT * FROM tipos_documento";
+        $result = $conexion->query($sql);
+        $_SESSION['documentTypes'] = $result->fetch_all(MYSQLI_ASSOC);
         $conexion->cerrar();
         include_once $pagina;
     }
@@ -102,6 +99,13 @@ class ControllerBase
         // Validar email y documento únicos (ambos errores a la vez)
         $sql = "SELECT email, documento FROM usuarios WHERE email = ? OR documento = ?";
         $stmt = $conexion->prepare($sql);
+        if (!$stmt) {
+            
+            $_SESSION['errors']['db'] = "Error de base de datos: " . $conexion->error;
+           
+            header("Location: index.php?action=getFormRegisterUser");
+            exit;
+        }
         $stmt->bind_param('ss', $Email, $Documento);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -123,8 +127,13 @@ class ControllerBase
 
         // Insertar usuario
         $passwordHash = password_hash($Contraseña1, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO usuarios (nombre, apellido, email, telefono, tipo_documento_id, documento, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO usuarios (nombre, apellido, email, telefono, tipo_documento_id, documento, `password`) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conexion->prepare($sql);
+        if (!$stmt) {
+            $_SESSION['errors']['db'] = "Error de preparación: " . $conexion->error;
+            header("Location: index.php?action=getFormRegisterUser");
+            exit;
+        }
         $stmt->bind_param('ssssiss', $Nombre, $Apellido, $Email, $Telefono, $TipoDocId, $Documento, $passwordHash);
         if (!$stmt->execute()) {
             $_SESSION['errors']['db'] = "Error al guardar: " . $stmt->error;

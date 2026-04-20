@@ -2,7 +2,6 @@
 // ============================================================
 // inicio.php — Página principal del usuario autenticado
 // ============================================================
-session_start();
 
 // Protección: si no hay sesión activa, redirigir al login
 
@@ -22,6 +21,7 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/home2.css"/>
+    <link rel="icon" href="img/recurso.png" type="image/png">
 </head>
 <body>
 
@@ -255,7 +255,6 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
       <span class="logo-text">VIÑA DEL MAR</span>
     </div>
     <p class="footer-copy">© <?= date('Y') ?> Hotel Viña del Mar · Todos los derechos reservados</p>
-    <a href="logout.php" class="footer-logout">Cerrar Sesión →</a>
   </div>
 </footer>
 

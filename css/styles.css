@@ -210,7 +210,7 @@ body {
 }
 
 .field-input::placeholder {
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .field-input:focus {
@@ -224,8 +224,29 @@ body {
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C9A96E' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.9rem center;
+  background-position: right 1rem center;
   padding-right: 2.5rem;
+  min-height: 3.2rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.field-select:valid {
+  color: #ffffff;
+}
+
+.field-select option {
+  background-color: #0d1b2a;
+  color: #ffffff;
+}
+
+.field-input.field-select {
+  padding: 0.75rem 1rem 0.75rem 1rem;
+}
+
+.field-select:focus {
+  outline: none;
+  border-color: #c9a96e;
+  box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.2);
 }
 
 /* Fondo del select para que las opciones sean legibles */

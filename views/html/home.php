@@ -1,6 +1,4 @@
-<?php
-session_start();
-?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,7 +8,7 @@ session_start();
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/home.css"/>
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3179/3179068.png" type="recurso/png"/>
+    <link rel="icon" href="img/recurso.png" type="image/png">
 </head>
 <body class="bg-[#0D1B2A] text-white">
 
