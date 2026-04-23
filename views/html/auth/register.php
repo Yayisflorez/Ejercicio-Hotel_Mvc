@@ -263,23 +263,39 @@ unset($_SESSION["mensaje"], $_SESSION["tipo"], $_SESSION["errors"], $_SESSION["d
       document.getElementById('documentoError').textContent = 'El número de documento es obligatorio';
       document.getElementById('documentoError').classList.remove('hidden');
       valid = false;
+    } 
+    if (!/^\d+$/.test(documento.replace(/\s+/g, ''))) {
+      document.getElementById('documentoError').textContent = 'El número de documento solo debe contener números';
+      document.getElementById('documentoError').classList.remove('hidden');
+      valid = false;
     }
     if (!nombre) {
       document.getElementById('nombreError').textContent = 'El nombre es obligatorio';
       document.getElementById('nombreError').classList.remove('hidden');
       valid = false;
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(nombre)) {
+      document.getElementById('nombreError').textContent = 'El nombre solo debe contener letras';
+      document.getElementById('nombreError').classList.remove('hidden');
+      valid = false;
     } else if (nombre.length < 3) {
       document.getElementById('nombreError').textContent = 'El nombre debe tener al menos 3 caracteres';
       document.getElementById('nombreError').classList.remove('hidden');
-      valid = false;
     }
     if (!apellido) {
       document.getElementById('apellidoError').textContent = 'El apellido es obligatorio';
       document.getElementById('apellidoError').classList.remove('hidden');
       valid = false;
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(apellido)) {
+      document.getElementById('apellidoError').textContent = 'El apellido solo debe contener letras';
+      document.getElementById('apellidoError').classList.remove('hidden');
+      valid = false;
     }
     if (!telefono) {
       document.getElementById('telefonoError').textContent = 'El teléfono es obligatorio';
+      document.getElementById('telefonoError').classList.remove('hidden');
+      valid = false;
+    } else if (!/^\d+$/.test(telefono.replace(/\s+/g, ''))) {
+      document.getElementById('telefonoError').textContent = 'El teléfono solo debe contener números';
       document.getElementById('telefonoError').classList.remove('hidden');
       valid = false;
     }
@@ -313,8 +329,7 @@ unset($_SESSION["mensaje"], $_SESSION["tipo"], $_SESSION["errors"], $_SESSION["d
 
     if (!valid) {
       e.preventDefault();
-    }
-  });
+    });
 </script>
 
 </body>

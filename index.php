@@ -27,9 +27,22 @@
         if($_GET['action'] == 'getFormInicioExitoso'){ 
             $controllerBase->verPaginaInicio('views/html/home2.php');
         }
+        if($_GET['action'] == 'getFormInicioExitosoServicios'){ 
+            $controllerBase->getFormInicioExitosoSecciones('index.php?action=getFormInicioExitoso#servicios');
+        }
+        
+        if($_GET['action'] == 'getFormInicioExitosoHabitaciones'){ 
+            $controllerBase->getFormInicioExitosoSecciones('index.php?action=getFormInicioExitoso#habitaciones');
+        }
+        if($_GET['action'] == 'getFormInicioExitosoReservas'){ 
+            $controllerBase->verPaginaInicio('views/html/auth/reservas.php');
+        }
 
         if($_GET['action'] == 'cerrarSesion'){ 
             $controllerBase->cerrarSesion();
+        }
+        if($_GET['action'] == 'reservas'){ 
+            $controllerBase->verPaginaInicio('views/html/auth/reservas.php');
         }
 
     }

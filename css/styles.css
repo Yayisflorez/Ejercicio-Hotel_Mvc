@@ -12,7 +12,6 @@
   padding: 0;
 }
 
-
 body {
   font-family: "Jost", sans-serif;
   background-color: #0d1b2a;
@@ -226,7 +225,6 @@ body {
   background-repeat: no-repeat;
   background-position: right 1rem center;
   padding-right: 2.5rem;
-  min-height: 3.2rem;
   color: rgba(255, 255, 255, 0.55);
 }
 
@@ -363,7 +361,7 @@ body {
 .success-message-hero {
   background: rgba(67, 252, 60, 0.9);
   border-radius: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   padding: 2.5rem 2rem 2rem 2rem;
   text-align: center;
   max-width: 350px;
@@ -373,7 +371,6 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.7rem;
-  
 }
 .success-icon {
   font-size: 2.5rem;
@@ -383,13 +380,13 @@ body {
 }
 .success-title {
   font-size: 1.5rem;
-  color: #0D1B2A;
-  font-family: 'Cormorant Garamond', serif;
+  color: #0d1b2a;
+  font-family: "Cormorant Garamond", serif;
   margin-bottom: 0.2rem;
 }
 .success-desc {
-  color: #0D1B2A;
+  color: #0d1b2a;
   font-size: 1rem;
-  font-family: 'Jost', sans-serif;
+  font-family: "Jost", sans-serif;
   opacity: 0.8;
 }

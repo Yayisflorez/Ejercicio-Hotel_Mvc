@@ -21,6 +21,14 @@ class ControllerBase
         include_once $pagina;
     }
 
+    public function getFormInicioExitosoSecciones($secciones){
+        $errors = $_SESSION['errors'] ?? [];
+        $old = $_SESSION['old'] ?? [];
+        $success = $_SESSION['success'] ?? '';
+
+        header('Location: ' . $secciones);
+    }
+
     public function registerUser()
     {
         $conexionObj = new Conexion();
@@ -53,20 +61,28 @@ class ControllerBase
 
         if (empty($Nombre)) {
             $errors['nombre'] = "El nombre es obligatorio";
+        } elseif (!preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/u', $Nombre)) {
+            $errors['nombre'] = "El nombre solo debe contener letras";
         } elseif (mb_strlen($Nombre) < 3) {
             $errors['nombre'] = "El nombre debe tener al menos 3 caracteres";
         }
         if (empty($Apellido)) {
             $errors['apellido'] = "El apellido es obligatorio";
+        } elseif (!preg_match('/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/u', $Apellido)) {
+            $errors['apellido'] = "El apellido solo debe contener letras";
         }
         if (empty($TipoDocId)) {
             $errors['tipo_documento_id'] = "El tipo de documento es obligatorio";
         }
         if (empty($Documento)) {
             $errors['documento'] = "El número de documento es obligatorio";
+        } elseif (!preg_match('/^\d+$/', str_replace(' ', '', $Documento))) {
+            $errors['documento'] = "El número de documento solo debe contener números";
         }
         if (empty($Telefono)) {
             $errors['telefono'] = "El teléfono es obligatorio";
+        } elseif (!preg_match('/^\d+$/', str_replace(' ', '', $Telefono))) {
+            $errors['telefono'] = "El teléfono solo debe contener números";
         }
 
         if (empty($Email)) {
@@ -204,6 +220,7 @@ class ControllerBase
 
         header("Location: index.php");
     }
+    
 }
 
 ?>
