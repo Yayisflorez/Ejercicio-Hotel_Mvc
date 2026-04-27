@@ -3,6 +3,10 @@
 // inicio.php — Página principal del usuario autenticado
 // ============================================================
 
+// Protección: si no hay sesión activa, redirigir al login
+
+
+// Datos del usuario desde la sesión (cargados al hacer login desde BD)
 
 $nombre = htmlspecialchars($_SESSION['usuario']['nombre'] ?? 'Huésped');
 $apellido = htmlspecialchars($_SESSION['usuario']['apellido'] ?? '');
@@ -16,7 +20,7 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
   <title>Inicio · Hotel Viña del Mar</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/home2.css"/>
+  <link rel="stylesheet" href="css/stylehome2.css"/>
     <link rel="icon" href="img/recurso.png" type="image/png">
 </head>
 <body>
@@ -176,70 +180,42 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
 
     <div class="habitaciones-grid">
       <?php
-      $habitaciones = [
-        [
-          'img'      => 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80',
-          'tipo'     => 'Estándar',
-          'nombre'   => 'Habitación Clásica',
-          'precio'   => '$180',
-          'detalle'  => 'Cama doble, vista al jardín, baño privado, WiFi premium.',
-          'badge'    => 'Disponible',
-          'badge_ok' => true,
-        ],
-        [
-          'img'      => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80',
-          'tipo'     => 'Superior',
-          'nombre'   => 'Suite Mar',
-          'precio'   => '$320',
-          'detalle'  => 'Cama king, balcón con vista al mar, bañera de lujo, minibar.',
-          'badge'    => 'Más popular',
-          'badge_ok' => true,
-        ],
-        [
-          'img'      => 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=900&q=80',
-          'tipo'     => 'Deluxe',
-          'nombre'   => 'Suite Presidencial',
-          'precio'   => '$650',
-          'detalle'  => 'Sala privada, jacuzzi, terraza panorámica, servicio butler 24h.',
-          'badge'    => 'Premium',
-          'badge_ok' => true,
-        ],
-        [
-          'img'      => 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=900&q=80',
-          'tipo'     => 'Familiar',
-          'nombre'   => 'Suite Familia',
-          'precio'   => '$420',
-          'detalle'  => 'Dos habitaciones conectadas, zona de juegos, camas adicionales.',
-          'badge'    => 'Disponible',
-          'badge_ok' => true,
-        ],
-      ];
-      foreach ($habitaciones as $hab): ?>
+      require_once "controller/HabitacionesController.php";
+      $habitacionesDb = HabitacionesController::obtenerHabitaciones();
+      
+      foreach ($habitacionesDb as $hab): 
+        $esDisponible = ($hab['estado']);
+      ?>
       <div class="hab-card">
         <div class="hab-img-wrap">
-          <img src="<?= $hab['img'] ?>" alt="<?= $hab['nombre'] ?>" class="hab-img"/>
-          <span class="hab-tipo"><?= $hab['tipo'] ?></span>
+          <img src="<?= $hab['img'] ?? 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80' ?>" alt="<?= htmlspecialchars($hab['categoria_nombre']) ?>" class="hab-img"/>
+          <span class="hab-tipo"><?= htmlspecialchars($hab['categoria_nombre']) ?></span>
         </div>
         <div class="hab-body">
           <div class="hab-header">
-            <h3 class="hab-nombre"><?= $hab['nombre'] ?></h3>
+            <span class="hab-badge <?= $esDisponible ? 'hab-badge--ok' : 'hab-badge--no' ?>">
+              <?= $esDisponible ? 'Disponible' : 'No disponible' ?>
+            </span>
             <div class="hab-precio-wrap">
               <span class="hab-desde">desde</span>
-              <span class="hab-precio"><?= $hab['precio'] ?></span>
+              <span class="hab-precio">$<?= number_format($hab['precio'], 0) ?></span>
               <span class="hab-noche">/noche</span>
             </div>
           </div>
-          <p class="hab-detalle"><?= $hab['detalle'] ?></p>
+          <p class="hab-detalle">
+            <?= $hab['descripcion'] ?>
+          </p>
           <div class="hab-footer">
-            <span class="hab-badge <?= $hab['badge_ok'] ? 'hab-badge--ok' : 'hab-badge--no' ?>">
-              <?= $hab['badge'] ?>
-            </span>
-            <button class="btn-reservar"
-              data-nombre="<?= $hab['nombre'] ?>"
-              data-tipo="<?= $hab['tipo'] ?>"
-              data-precio="<?= $hab['precio'] ?>"
-              data-img="<?= $hab['img'] ?>"
-              onclick="abrirReserva(this)">Reservar</button>
+            <?php if ($esDisponible): ?>
+              <button class="btn-reservar"
+                data-id="<?= $hab['id'] ?>"
+                data-nombre="<?= htmlspecialchars($hab['categoria_nombre']) ?>"
+                data-tipo="<?= htmlspecialchars($hab['categoria_nombre']) ?>"
+                data-precio="$<?= $hab['precio'] ?>"
+                data-img="<?= $hab['img'] ?? 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80' ?>"
+                data-max-personas="<?= $hab['max_personas'] ?? 4 ?>"
+                onclick="abrirReserva(this)">Reservar</button>
+            <?php endif; ?>
           </div>
         </div>
       </div>
@@ -248,18 +224,23 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
   </div>
 </section>
 
+
+
+
+
 <!-- ============================================================
-     MODAL DE RESERVA
-     ============================================================ -->
+  MODAL DE RESERVA 
+============================================================ -->
 <div id="modalReserva" class="modal-backdrop" onclick="cerrarReserva(event)">
   <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
 
-    <!-- Botón cerrar -->
-    <button class="modal-close" onclick="cerrarReserva(null, true)" aria-label="Cerrar">✕</button>
-
+    
     <!-- Encabezado con imagen y datos de la hab -->
     <div class="modal-header">
+      
       <div class="modal-header-img-wrap">
+        <!-- Botón cerrar -->
+      <button class="modal-close" onclick="cerrarReserva(null, true)" aria-label="Cerrar">✕</button>
         <img id="modal-img" src="" alt="" class="modal-header-img"/>
         <div class="modal-header-overlay"></div>
       </div>
@@ -272,10 +253,8 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
         </div>
       </div>
     </div>
-
     <!-- Cuerpo del formulario -->
     <div class="modal-body">
-
       <!-- Resumen de precio dinámico -->
       <div class="modal-resumen" id="modal-resumen">
         <div class="resumen-row">
@@ -291,9 +270,9 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
           <span id="res-total" class="resumen-valor resumen-total-val">—</span>
         </div>
       </div>
-
-      <form id="formReserva" class="modal-form" onsubmit="confirmarReserva(event)">
-
+      <form id="formReserva" class="modal-form" action="index.php?action=reservarHabitacion" method="POST">
+        <input type="hidden" name="id_habitacion" id="input-hab-id">
+        <input type="hidden" name="precio" id="input-precio-hidden">
         <!-- Calendario: fechas -->
         <div class="form-section">
           <p class="form-section-title">📅 Fechas de estadía</p>
@@ -316,76 +295,53 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
           </div>
           <!-- Inputs ocultos con las fechas elegidas -->
           <input type="hidden" name="fecha_inicio" id="fecha_inicio"/>
-          <input type="hidden" name="fecha_fin"    id="fecha_fin"/>
+          <input type="hidden" name="fecha_final"  id="fecha_fin"/>
           <div class="fechas-seleccionadas" id="fechas-texto">
             Selecciona tu fecha de entrada en el calendario
           </div>
         </div>
-
-        <!-- Cantidad de personas -->
+        <!-- Personas -->
         <div class="form-section">
-          <p class="form-section-title">👥 Cantidad de personas</p>
+          <p class="form-section-title">👥 Número de personas</p>
           <div class="personas-selector">
             <button type="button" class="personas-btn" onclick="cambiarPersonas(-1)">−</button>
-            <div class="personas-display">
+            <span class="personas-display">
               <span id="personas-num" class="personas-num">1</span>
-              <span class="personas-label">persona(s)</span>
-            </div>
+              <span class="personas-label">persona<span id="personas-plural" style="display:none;">s</span></span>
+              <span id="personas-hint" class="personas-hint">Selecciona fechas para continuar</span>
+            </span>
             <button type="button" class="personas-btn" onclick="cambiarPersonas(1)">+</button>
           </div>
-          <input type="hidden" name="personas" id="personas-input" value="1"/>
-          <p class="personas-hint">Máximo 4 personas por habitación</p>
+          <input type="hidden" name="num_personas" id="personas-input" value="1">
         </div>
 
         <!-- Método de pago -->
         <div class="form-section">
           <p class="form-section-title">💳 Método de pago</p>
-          <div class="pagos-grid">
-
-            <label class="pago-card" for="pago-nequi">
-              <input type="radio" name="pago" id="pago-nequi" value="nequi" required/>
-              <div class="pago-card-inner">
-                <div class="pago-logo pago-nequi">
-                  <span class="pago-logo-letter">N</span>
-                </div>
-                <span class="pago-nombre">Nequi</span>
-                <span class="pago-desc">Pago digital</span>
-              </div>
+          <div class="pago-options">
+            <label class="pago-option">
+              <input type="radio" name="id_metodo_pago" value="1" id="pago-nequi" checked>
+              <span class="pago-icon">💜</span>
+              <span class="pago-name">Nequi</span>
             </label>
-
-            <label class="pago-card" for="pago-daviplata">
-              <input type="radio" name="pago" id="pago-daviplata" value="daviplata" required/>
-              <div class="pago-card-inner">
-                <div class="pago-logo pago-daviplata">
-                  <span class="pago-logo-letter">D</span>
-                </div>
-                <span class="pago-nombre">Daviplata</span>
-                <span class="pago-desc">Banco Davivienda</span>
-              </div>
+            <label class="pago-option">
+              <input type="radio" name="id_metodo_pago" value="2" id="pago-daviplata">
+              <span class="pago-icon">❤️</span>
+              <span class="pago-name">Daviplata</span>
             </label>
-
-            <label class="pago-card" for="pago-bancolombia">
-              <input type="radio" name="pago" id="pago-bancolombia" value="bancolombia" required/>
-              <div class="pago-card-inner">
-                <div class="pago-logo pago-bancolombia">
-                  <span class="pago-logo-letter">B</span>
-                </div>
-                <span class="pago-nombre">Bancolombia</span>
-                <span class="pago-desc">Transferencia</span>
-              </div>
+            <label class="pago-option">
+              <input type="radio" name="id_metodo_pago" value="3" id="pago-bancolombia">
+              <span class="pago-icon">🏦</span>
+              <span class="pago-name">Bancolombia</span>
             </label>
-
           </div>
         </div>
-
         <!-- Botón confirmar -->
         <button type="submit" class="btn-confirmar" id="btn-confirmar">
           Confirmar Reserva
         </button>
-
       </form>
     </div><!-- /modal-body -->
-
   </div><!-- /modal-box -->
 </div>
 
@@ -397,10 +353,6 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
     <p class="toast-sub" id="toast-sub"></p>
   </div>
 </div>
-
-<!-- ============================================================
-     FOOTER
-     ============================================================ -->
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-logo">
@@ -412,8 +364,8 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
 </footer>
 
 <!-- ============================================================
-     JAVASCRIPT — Menú hamburguesa móvil + navbar activo al scroll
-     ============================================================ -->
+    JAVASCRIPT — Menú hamburguesa móvil + navbar activo al scroll
+============================================================ -->
 <script>
   // Menú hamburguesa
   const hamburger   = document.getElementById('hamburger');
@@ -447,232 +399,198 @@ $email    = htmlspecialchars($_SESSION['usuario']['email']    ?? '');
   }, { threshold: 0.4 });
 
   sections.forEach(s => observer.observe(s));
-</script>
 
-<!-- ============================================================
-     JAVASCRIPT — Modal de Reservas
-     ============================================================ -->
-<script>
-// ── Estado del modal ──────────────────────────────────────────
-let precioNoche   = 0;
-let personasCount = 1;
-let calYear, calMonth;
-let fechaInicio   = null; // Date
-let fechaFin      = null; // Date
+  // ===================== MODAL RESERVA =====================
+  let precioActual = 0;
+  let currentViewDate = new Date();
+  let fechaInicio = null;
+  let fechaFin = null;
+  let maxPersonas = 4; // default
 
-// ── Abrir modal ───────────────────────────────────────────────
-function abrirReserva(btn) {
-  const nombre = btn.dataset.nombre;
-  const tipo   = btn.dataset.tipo;
-  const precio = btn.dataset.precio;   // e.g. "$180"
-  const img    = btn.dataset.img;
+  function abrirReserva(btn) {
+    document.getElementById('modalReserva').classList.add('open');
+    document.body.style.overflow = 'hidden';
 
-  // Parsear precio a número
-  precioNoche = parseInt(precio.replace(/[^0-9]/g, ''), 10);
+    fechaInicio = null;
+    fechaFin = null;
+    currentViewDate = new Date();
 
-  // Llenar encabezado
-  document.getElementById('modal-img').src            = img;
-  document.getElementById('modal-img').alt            = nombre;
-  document.getElementById('modal-tipo').textContent   = tipo;
-  document.getElementById('modal-title').textContent  = nombre;
-  document.getElementById('modal-precio-noche').textContent = precio + ' / noche';
-  document.getElementById('res-nombre').textContent   = nombre;
-
-  // Reiniciar estado
-  personasCount = 1;
-  fechaInicio   = null;
-  fechaFin      = null;
-  document.getElementById('personas-num').textContent  = '1';
-  document.getElementById('personas-input').value      = '1';
-  document.getElementById('fecha_inicio').value        = '';
-  document.getElementById('fecha_fin').value           = '';
-  document.getElementById('fechas-texto').textContent  = 'Selecciona tu fecha de entrada en el calendario';
-  document.getElementById('res-noches').textContent    = '—';
-  document.getElementById('res-total').textContent     = '—';
-
-  // Desmarcar métodos de pago
-  document.querySelectorAll('.pago-card input').forEach(r => r.checked = false);
-  document.querySelectorAll('.pago-card').forEach(c => c.classList.remove('selected'));
-
-  // Inicializar calendario en mes actual
-  const hoy  = new Date();
-  calYear    = hoy.getFullYear();
-  calMonth   = hoy.getMonth();
-  renderCalendario();
-
-  // Mostrar modal
-  document.getElementById('modalReserva').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-// ── Cerrar modal ──────────────────────────────────────────────
-function cerrarReserva(event, forzar) {
-  if (forzar || (event && event.target === document.getElementById('modalReserva'))) {
-    document.getElementById('modalReserva').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-}
-
-// ── Calendario ────────────────────────────────────────────────
-const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
-function renderCalendario() {
-  document.getElementById('cal-month-label').textContent = MESES[calMonth] + ' ' + calYear;
-
-  const grid  = document.getElementById('cal-grid');
-  grid.innerHTML = '';
-
-  const hoy       = new Date(); hoy.setHours(0,0,0,0);
-  const primerDia = new Date(calYear, calMonth, 1).getDay();
-  const diasMes   = new Date(calYear, calMonth + 1, 0).getDate();
-
-  // Celdas vacías al inicio
-  for (let i = 0; i < primerDia; i++) {
-    const blank = document.createElement('div');
-    blank.className = 'cal-cell cal-blank';
-    grid.appendChild(blank);
-  }
-
-  for (let d = 1; d <= diasMes; d++) {
-    const fecha = new Date(calYear, calMonth, d);
-    const cell  = document.createElement('div');
-    cell.className  = 'cal-cell';
-    cell.textContent = d;
-
-    if (fecha < hoy) {
-      cell.classList.add('cal-past');
-    } else {
-      // Marcar inicio, rango y fin
-      if (fechaInicio && fechaFin) {
-        if (esMismaFecha(fecha, fechaInicio))   cell.classList.add('cal-start');
-        else if (esMismaFecha(fecha, fechaFin)) cell.classList.add('cal-end');
-        else if (fecha > fechaInicio && fecha < fechaFin) cell.classList.add('cal-range');
-      } else if (fechaInicio && esMismaFecha(fecha, fechaInicio)) {
-        cell.classList.add('cal-start');
-      }
-
-      cell.addEventListener('click', () => seleccionarFecha(fecha));
-    }
-
-    grid.appendChild(cell);
-  }
-
-  // Botón prev: deshabilitar si estamos en el mes actual
-  const hoyMes = new Date(); hoyMes.setDate(1); hoyMes.setHours(0,0,0,0);
-  const esteMs = new Date(calYear, calMonth, 1);
-  document.getElementById('cal-prev').disabled = esteMs <= hoyMes;
-}
-
-function esMismaFecha(a, b) {
-  return a.getFullYear() === b.getFullYear() &&
-         a.getMonth()    === b.getMonth()    &&
-         a.getDate()     === b.getDate();
-}
-
-function cambiarMes(delta) {
-  calMonth += delta;
-  if (calMonth > 11) { calMonth = 0;  calYear++; }
-  if (calMonth < 0)  { calMonth = 11; calYear--; }
-  renderCalendario();
-}
-
-function seleccionarFecha(fecha) {
-  if (!fechaInicio || (fechaInicio && fechaFin)) {
-    // Primera selección o reinicio
-    fechaInicio = fecha;
-    fechaFin    = null;
-  } else {
-    if (fecha <= fechaInicio) {
-      fechaInicio = fecha;
-      fechaFin    = null;
-    } else {
-      fechaFin = fecha;
-    }
-  }
-  actualizarFechasUI();
-  renderCalendario();
-}
-
-function actualizarFechasUI() {
-  const fmt = d => d.toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
-
-  if (fechaInicio && !fechaFin) {
-    document.getElementById('fechas-texto').innerHTML =
-      `<span class="fecha-chip entrada">✈️ Entrada: ${fmt(fechaInicio)}</span>
-       <span class="fecha-chip-hint">Ahora selecciona la fecha de salida</span>`;
-    document.getElementById('fecha_inicio').value = fechaInicio.toISOString().slice(0,10);
-    document.getElementById('fecha_fin').value    = '';
+    // Cargar datos de la habitación
+    document.getElementById('modal-img').src = btn.getAttribute('data-img');
+    document.getElementById('modal-tipo').textContent = btn.getAttribute('data-tipo');
+    document.getElementById('modal-title').textContent = btn.getAttribute('data-nombre');
+    document.getElementById('modal-precio-noche').textContent = btn.getAttribute('data-precio');
+    document.getElementById('input-hab-id').value = btn.getAttribute('data-id');
+    document.getElementById('input-precio-hidden').value = btn.getAttribute('data-precio').replace(/[^\d]/g, '');
+    document.getElementById('res-nombre').textContent = btn.getAttribute('data-nombre');
+    maxPersonas = parseInt(btn.getAttribute('data-max-personas')) || 4;
+    // Reset personas y fechas
+    document.getElementById('personas-num').textContent = '1';
+    document.getElementById('personas-input').value = '1';
+    document.getElementById('fecha_inicio').value = '';
+    document.getElementById('fecha_fin').value = '';
     document.getElementById('res-noches').textContent = '—';
-    document.getElementById('res-total').textContent  = '—';
-  } else if (fechaInicio && fechaFin) {
-    const noches = Math.round((fechaFin - fechaInicio) / 86400000);
-    const total  = noches * precioNoche;
-    document.getElementById('fechas-texto').innerHTML =
-      `<span class="fecha-chip entrada">✈️ Entrada: ${fmt(fechaInicio)}</span>
-       <span class="fecha-chip salida">🏁 Salida: ${fmt(fechaFin)}</span>`;
-    document.getElementById('fecha_inicio').value = fechaInicio.toISOString().slice(0,10);
-    document.getElementById('fecha_fin').value    = fechaFin.toISOString().slice(0,10);
-    document.getElementById('res-noches').textContent = noches + (noches === 1 ? ' noche' : ' noches');
-    document.getElementById('res-total').textContent  = '$' + total.toLocaleString('es-CO');
+    document.getElementById('res-total').textContent = '—';
+    document.getElementById('fechas-texto').textContent = 'Selecciona tu fecha de entrada en el calendario';
+    document.getElementById('max-hint').textContent = 'Selecciona fechas para continuar';
+
+    precioActual = parseInt(btn.getAttribute('data-precio').replace(/[^\d]/g, ''));
+
+    renderizarCalendario();
   }
-}
 
-// ── Personas ──────────────────────────────────────────────────
-function cambiarPersonas(delta) {
-  personasCount = Math.max(1, Math.min(4, personasCount + delta));
-  document.getElementById('personas-num').textContent  = personasCount;
-  document.getElementById('personas-input').value      = personasCount;
+  function cambiarMes(delta) {
+    currentViewDate.setMonth(currentViewDate.getMonth() + delta);
+    renderizarCalendario();
+  }
 
-  // Efecto visual en los botones
-  document.querySelector('.personas-btn:first-child').disabled = personasCount === 1;
-  document.querySelector('.personas-btn:last-child').disabled  = personasCount === 4;
-}
+  function renderizarCalendario() {
+    const grid = document.getElementById('cal-grid');
+    const label = document.getElementById('cal-month-label');
+    if (!grid || !label) return;
 
-// ── Resaltar tarjeta de pago al seleccionar ───────────────────
-document.querySelectorAll('.pago-card input').forEach(radio => {
-  radio.addEventListener('change', () => {
-    document.querySelectorAll('.pago-card').forEach(c => c.classList.remove('selected'));
-    radio.closest('.pago-card').classList.add('selected');
+    grid.innerHTML = '';
+    const year = currentViewDate.getFullYear();
+    const month = currentViewDate.getMonth();
+
+    // Formatear nombre del mes y año (Capitalizado)
+    const monthName = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(currentViewDate);
+    label.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    // Celdas vacías iniciales
+    for (let i = 0; i < firstDay; i++) {
+      const div = document.createElement('div');
+      div.className = 'cal-cell cal-blank';
+      grid.appendChild(div);
+    }
+
+    // Generar días del mes
+    for (let d = 1; d <= totalDays; d++) {
+      const dateObj = new Date(year, month, d);
+      const dateStr = dateObj.toISOString().split('T')[0];
+      const div = document.createElement('div');
+      div.className = 'cal-cell';
+      div.textContent = d;
+
+      if (dateObj < today) {
+        div.classList.add('cal-past');
+      } else {
+        div.onclick = () => seleccionarFecha(dateStr);
+        if (dateStr === fechaInicio) div.classList.add('cal-start');
+        if (dateStr === fechaFin) div.classList.add('cal-end');
+        if (fechaInicio && fechaFin && dateStr > fechaInicio && dateStr < fechaFin) {
+          div.classList.add('cal-range');
+        }
+      }
+      grid.appendChild(div);
+    }
+  }
+
+  function seleccionarFecha(fecha) {
+    if (!fechaInicio || (fechaInicio && fechaFin)) {
+      fechaInicio = fecha;
+      fechaFin = null;
+      document.getElementById('fechas-texto').innerHTML = `<span class="fecha-chip entrada">Entrada: ${fecha}</span> <span class="fecha-chip-hint">Selecciona salida</span>`;
+    } else if (fecha > fechaInicio) {
+      fechaFin = fecha;
+      document.getElementById('fechas-texto').innerHTML = `<span class="fecha-chip entrada">Entrada: ${fechaInicio}</span> <span class="fecha-chip salida">Salida: ${fechaFin}</span>`;
+    } else {
+      fechaInicio = fecha;
+      fechaFin = null;
+    }
+    document.getElementById('fecha_inicio').value = fechaInicio || '';
+    document.getElementById('fecha_fin').value = fechaFin || '';
+    renderizarCalendario();
+    calcularTotalGeneral();
+    cambiarPersonas(0); // Actualizar estado de botones
+  }
+
+  function cerrarReserva(event, forzar) {
+    if (forzar || (event && event.target === document.getElementById('modalReserva'))) {
+      document.getElementById('modalReserva').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+  function cambiarPersonas(delta) {
+    const input = document.getElementById('personas-input');
+    const display = document.getElementById('personas-num');
+    const plural = document.getElementById('personas-plural');
+    const btnMenos = document.querySelector('.personas-btn:first-of-type');
+    const btnMas = document.querySelector('.personas-btn:last-of-type');
+    let num = parseInt(input.value) + delta;
+    num = Math.max(1, Math.min(maxPersonas, num)); // Min 1, max maxPersonas
+    input.value = num;
+    display.textContent = num;
+    plural.style.display = num > 1 ? 'inline' : 'none';
+    const hint = document.getElementById('personas-hint');
+    if (num >= maxPersonas) {
+      hint.textContent = `Máximo ${maxPersonas} persona${maxPersonas > 1 ? 's' : ''}`;
+    } else {
+      hint.textContent = fechaInicio && fechaFin ? 'Ajusta el número de personas' : 'Selecciona fechas para continuar';
+    }
+    // Deshabilitar botones si no hay fechas
+    const disabled = !fechaInicio || !fechaFin;
+    btnMenos.disabled = disabled;
+    btnMas.disabled = disabled;
+  }
+
+  function calcularTotalGeneral() {
+    if (fechaInicio && fechaFin && precioActual > 0) {
+      const d1 = new Date(fechaInicio);
+      const d2 = new Date(fechaFin);
+      const noches = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+      document.getElementById('res-noches').textContent = noches > 0 ? noches : '—';
+      document.getElementById('res-total').textContent = (noches > 0) ? '$' + (noches * precioActual).toLocaleString() : '—';
+    } else {
+      document.getElementById('res-noches').textContent = '—';
+      document.getElementById('res-total').textContent = '—';
+    }
+  }
+
+  // Selección visual de pago
+  function actualizarPagoSeleccionado() {
+    document.querySelectorAll('.pago-option').forEach(label => {
+      const input = label.querySelector('input[type=\"radio\"]');
+      label.classList.toggle('selected', input && input.checked);
+    });
+  }
+
+  document.querySelectorAll('.pago-option input[type=\"radio\"]').forEach(input => {
+    input.addEventListener('change', actualizarPagoSeleccionado);
   });
-});
 
-// ── Confirmar reserva ─────────────────────────────────────────
-function confirmarReserva(e) {
-  e.preventDefault();
+  actualizarPagoSeleccionado();
 
-  if (!fechaInicio || !fechaFin) {
-    shakeEl('fechas-texto'); return;
+  // Validación antes de enviar
+  document.getElementById('formReserva').addEventListener('submit', function(e) {
+    const fechaInicio = document.getElementById('fecha_inicio').value;
+    const fechaFin = document.getElementById('fecha_fin').value;
+    const numPersonas = document.getElementById('personas-input').value;
+    const pagoSeleccionado = document.querySelector('input[name=\"id_metodo_pago\"]:checked');
+
+    if (!fechaInicio || !fechaFin || !numPersonas || !pagoSeleccionado) {
+      e.preventDefault();
+      showToast('⚠️', 'Campos incompletos', 'Por favor llenar todos los campos para poder reservar.');
+      return false;
+    }
+  });
+
+  function showToast(icon, title, subtitle) {
+    const toast = document.getElementById('toast');
+    const toastIcon = document.querySelector('.toast-icon');
+    const toastTitle = document.querySelector('.toast-title');
+    const toastSub = document.querySelector('.toast-sub');
+    toastIcon.textContent = icon;
+    toastTitle.textContent = title;
+    toastSub.textContent = subtitle;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
   }
-
-  const metodo = document.querySelector('input[name="pago"]:checked');
-  if (!metodo) { shakeEl('pagos-grid'); return; }
-
-  const fmt    = d => d.toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
-  const noches = Math.round((fechaFin - fechaInicio) / 86400000);
-  const total  = noches * precioNoche;
-
-  document.getElementById('toast-sub').textContent =
-    `${document.getElementById('modal-title').textContent} · ${fmt(fechaInicio)} → ${fmt(fechaFin)} · $${total.toLocaleString('es-CO')} · ${metodo.value}`;
-
-  cerrarReserva(null, true);
-
-  const toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 4500);
-}
-
-function shakeEl(id) {
-  const el = document.getElementById(id) || document.querySelector('.' + id);
-  if (!el) return;
-  el.classList.add('shake');
-  setTimeout(() => el.classList.remove('shake'), 500);
-}
-
-// Cerrar con Escape
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') cerrarReserva(null, true);
-});
 </script>
 
 </body>

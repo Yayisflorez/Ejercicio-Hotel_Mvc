@@ -488,6 +488,559 @@ body {
 .toast-title { font-size: .85rem; font-weight: 500; color: var(--green); margin-bottom: .2rem; }
 .toast-sub   { font-size: .72rem; color: var(--w40); line-height: 1.5; }
 
+/* ── MODAL DE RESERVA ──────────────────────────────────────── */
+/* --- Backdrop --- */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(5, 12, 22, 0.8);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.modal-backdrop.open {
+  display: flex;
+}
+
+/* --- Caja del modal --- */
+.modal-box {
+  position: relative;
+  background: #0f2033;
+  border: 1px solid rgba(201, 169, 110, 0.25);
+  width: 100%;
+  max-width: 620px;
+  max-height: 92vh;
+  overflow-y: auto;
+  border-radius: 2px;
+  animation: modalIn 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 169, 110, 0.3) transparent;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- Botón cerrar --- */
+.modal-close {
+  position: sticky;
+  top: 0.75rem;
+  float: right;
+  margin: 0.75rem 0.75rem 0 0;
+  z-index: 10;
+  background: rgba(13, 27, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.55);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* --- Header con imagen --- */
+.modal-header {
+  display: flex;
+  height: 140px;
+  overflow: hidden;
+  position: relative;
+  margin-top: -40px; /* queda debajo del btn close */
+}
+
+.modal-header-img-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.modal-header-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+}
+
+.modal-header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(10, 20, 32, 0.92) 35%,
+    rgba(10, 20, 32, 0.55) 100%
+  );
+}
+
+.modal-header-info {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.25rem 1.5rem;
+  padding-top: 2rem;
+}
+
+.modal-hab-tipo {
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.3rem;
+}
+
+.modal-hab-nombre {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: #fff;
+  margin-bottom: 0.4rem;
+}
+
+.modal-precio-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-precio-label {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.08em;
+}
+
+.modal-precio-valor {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.2rem;
+  color: var(--gold);
+  font-weight: 300;
+}
+
+/* --- Resumen dinámico --- */
+.modal-resumen {
+  background: rgba(201, 169, 110, 0.07);
+  border: 1px solid rgba(201, 169, 110, 0.2);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resumen-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.resumen-label {
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.04em;
+}
+
+.resumen-valor {
+  color: #fff;
+  font-weight: 400;
+}
+
+.resumen-total {
+  border-top: 1px solid rgba(201, 169, 110, 0.2);
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.resumen-total-val {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.3rem;
+  color: var(--gold);
+  font-weight: 300;
+}
+
+/* --- Cuerpo del modal --- */
+.modal-body {
+  padding: 1.5rem;
+  padding-top: 1rem;
+}
+
+/* --- Secciones del formulario --- */
+.form-section {
+  margin-bottom: 1.75rem;
+}
+
+.form-section-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* --- Select --- */
+.form-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.85rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: rgba(201, 169, 110, 0.06);
+}
+
+.form-select option {
+  background: #0f2033;
+  color: #fff;
+}
+
+/* --- Calendario --- */
+.calendar-wrap {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.cal-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.cal-month-label {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.cal-nav-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  width: 30px;
+  height: 30px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+  border-radius: 2px;
+}
+
+.cal-nav-btn:hover:not(:disabled) {
+  background: rgba(201, 169, 110, 0.15);
+  color: var(--gold);
+  border-color: rgba(201, 169, 110, 0.4);
+}
+
+.cal-nav-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  color: rgba(255, 255, 255, 0.8);
+  user-select: none;
+}
+
+.cal-cell:not(.cal-past):not(.cal-blank):hover {
+  background: rgba(201, 169, 110, 0.2);
+  color: #fff;
+}
+
+.cal-blank,
+.cal-past {
+  cursor: default;
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.cal-start {
+  background: var(--gold) !important;
+  color: #0d1b2a !important;
+  font-weight: 600;
+  border-radius: 2px 0 0 2px;
+}
+
+.cal-end {
+  background: var(--gold) !important;
+  color: #0d1b2a !important;
+  font-weight: 600;
+  border-radius: 0 2px 2px 0;
+}
+
+.cal-range {
+  background: rgba(201, 169, 110, 0.18) !important;
+  color: var(--gold) !important;
+  border-radius: 0;
+}
+
+/* Texto de fechas seleccionadas */
+.fechas-display {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 28px;
+}
+
+.fecha-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 2px;
+}
+
+.fecha-chip.entrada {
+  background: rgba(201, 169, 110, 0.15);
+  border: 1px solid rgba(201, 169, 110, 0.35);
+  color: var(--gold);
+}
+
+.fecha-chip.salida {
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: #4ade80;
+}
+
+.fecha-chip-hint {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-style: italic;
+}
+
+/* --- Personas --- */
+.personas-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.personas-btn {
+  width: 50px;
+  height: 50px;
+  border: 1px solid rgba(201, 169, 110, 0.45);
+  background: transparent;
+  color: var(--gold);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  line-height: 1;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
+  font-family: "Jost", sans-serif;
+}
+
+.personas-btn:hover:not(:disabled) {
+  background: rgba(201, 169, 110, 0.15);
+  transform: translateY(-1px);
+}
+
+.personas-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.personas-display {
+  text-align: center;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.personas-num {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 3rem;
+  font-weight: 300;
+  color: #fff;
+  line-height: 1;
+  display: block;
+}
+
+.personas-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  display: block;
+}
+
+.personas-plural {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* --- Métodos de pago --- */
+.pago-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.pago-option {
+  cursor: pointer;
+  display: block;
+}
+
+.pago-option input[type="radio"] {
+  display: none;
+}
+
+.pago-option {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.15s;
+  border-radius: 2px;
+}
+
+.pago-option:hover {
+  border-color: rgba(201, 169, 110, 0.35);
+  background: rgba(201, 169, 110, 0.06);
+}
+
+.pago-option.selected {
+  border-color: var(--gold);
+  background: rgba(201, 169, 110, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(201, 169, 110, 0.18);
+}
+
+.pago-option.selected .pago-icon {
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.18);
+}
+
+.pago-option.selected .pago-name {
+  color: var(--gold);
+}
+
+.pago-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+  font-size: 1.2rem;
+}
+
+.personas-hint {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-style: italic;
+}
+
+.pago-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: 0.03em;
+}
+
+/* --- Botón reservar --- */
+.btn-reservar {
+  width: 100%;
+  padding: 1rem;
+  background: var(--gold);
+  color: #0d1b2a;
+  border: none;
+  font-family: "Jost", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+  margin-top: 0.5rem;
+}
+
+.btn-reservar:hover {
+  background: var(--gold-dark);
+  transform: translateY(-1px);
+}
+
 /* ── FOOTER ────────────────────────────────────────────────── */
 .site-footer {
   border-top: 1px solid var(--w10);
@@ -518,4 +1071,35 @@ body {
   .mobile-cards { display: none; }
 
   .footer-inner { flex-direction: row; justify-content: space-between; text-align: left; }
+}
+
+/* --- Editar fechas --- */
+.edit-fechas {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.edit-fechas label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.edit-fechas input[type="date"] {
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: #fff;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem;
+}
+
+.edit-fechas input[type="date"]:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.2);
 }
