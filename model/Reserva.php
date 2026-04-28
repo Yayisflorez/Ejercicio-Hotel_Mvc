@@ -12,6 +12,7 @@ class Reserva {
                     r.num_personas AS personas, 
                     r.estado, 
                     r.precio AS total, 
+                    h.max_personas,
                     h.num_habitacion AS habitacion, 
                     c.nombre AS tipo, 
                     m.nombre AS pago,

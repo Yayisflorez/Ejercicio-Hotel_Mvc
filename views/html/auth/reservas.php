@@ -199,7 +199,7 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
           <?php foreach ($reservas as $r):
             $ec = $estado_cfg[$r['estado']] ?? ['label'=>$r['estado'],'class'=>''];
           ?>
-          <tr class="res-row" data-id="<?= $r['id'] ?>">
+          <tr class="res-row" data-id="<?= $r['id'] ?>" data-max-personas="<?= $r['max_personas'] ?>">
 
             <!-- Habitación -->
             <td class="td-hab">
@@ -218,12 +218,12 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
               <div class="fechas-cell">
                 <div class="fecha-item">
                   <span class="fecha-lbl">✈️ Entrada</span>
-                  <span class="fecha-val"><?= $fmt_fecha($r['entrada']) ?></span>
+                  <span class="fecha-val" data-iso="<?= $r['entrada'] ?>"><?= $fmt_fecha($r['entrada']) ?></span>
                 </div>
                 <div class="fecha-sep">→</div>
                 <div class="fecha-item">
                   <span class="fecha-lbl">🏁 Salida</span>
-                  <span class="fecha-val"><?= $fmt_fecha($r['salida']) ?></span>
+                  <span class="fecha-val" data-iso="<?= $r['salida'] ?>"><?= $fmt_fecha($r['salida']) ?></span>
                 </div>
                 <span class="noches-badge"><?= $r['noches'] ?> noches</span>
               </div>
@@ -600,7 +600,7 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
   MODAL DE EDITAR RESERVA
 ============================================================ -->
 <div id="modalEditar" class="modal-backdrop" onclick="cerrarEditar(event)">
-  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="edit-title">
+  <div class="modal-box modal-edit-grande" role="dialog" aria-modal="true" aria-labelledby="edit-title">
     <button class="modal-close" onclick="cerrarEditar(null, true)" aria-label="Cerrar">✕</button>
 
     <div class="modal-header">
@@ -611,6 +611,7 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
       <div class="modal-header-info">
         <span id="edit-tipo" class="modal-hab-tipo"></span>
         <h2 id="edit-title" class="modal-hab-nombre">Editar Reserva</h2>
+        <p class="edit-sub">Ajusta las fechas, personas y método de pago</p>
       </div>
     </div>
 
@@ -618,32 +619,42 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
       <form id="formEditar" class="modal-form">
         <input type="hidden" id="edit-reserva-id">
 
-        <!-- Fechas -->
+        <!-- Calendario de edición -->
         <div class="form-section">
-          <p class="form-section-title">📅 Fechas de estadía</p>
-          <div class="edit-fechas">
-            <label>Entrada:
-              <input type="date" id="edit-fecha-inicio" required>
-            </label>
-            <label>Salida:
-              <input type="date" id="edit-fecha-fin" required>
-            </label>
+          <p class="form-section-title">📅 Selecciona tus fechas</p>
+          <div class="edit-cal-wrap">
+            <div class="cal-month-nav">
+              <button type="button" class="cal-nav-btn" onclick="cambiarMesEdit(-1)">‹</button>
+              <span class="cal-month-label" id="edit-cal-month-label"></span>
+              <button type="button" class="cal-nav-btn" onclick="cambiarMesEdit(1)">›</button>
+            </div>
+            <div class="cal-dias-semana">
+              <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span>
+              <span>Ju</span><span>Vi</span><span>Sa</span>
+            </div>
+            <div class="cal-grid cal-grid--grande" id="edit-cal-grid"></div>
           </div>
+          <div class="fechas-display" id="edit-fechas-texto">
+            <span class="fecha-chip-hint">Selecciona entrada y salida</span>
+          </div>
+          <input type="hidden" id="edit-fecha-inicio">
+          <input type="hidden" id="edit-fecha-fin">
         </div>
 
-        <!-- Personas -->
-        <div class="form-section">
-          <p class="form-section-title">👥 Número de personas</p>
-          <div class="personas-selector">
-            <button type="button" class="personas-btn" onclick="cambiarPersonasEdit(-1)">−</button>
-            <span class="personas-display">
-              <span id="edit-personas-num" class="personas-num">1</span>
-              <span class="personas-label">persona<span id="edit-personas-plural" style="display:none;">s</span></span>
-            </span>
-            <button type="button" class="personas-btn" onclick="cambiarPersonasEdit(1)">+</button>
-          </div>
-          <input type="hidden" id="edit-personas-input" value="1">
+      <!-- Personas -->
+      <div class="form-section">
+        <p class="form-section-title">👥 Número de personas</p>
+        <div class="personas-selector">
+          <button type="button" class="personas-btn" onclick="cambiarPersonasEdit(-1)">−</button>
+          <span class="personas-display">
+            <span id="edit-personas-num" class="personas-num">1</span>
+            <span class="personas-label">persona<span id="edit-personas-plural" style="display:none;">s</span></span>
+            <span id="edit-personas-hint" class="personas-hint"></span>  <!-- ← agrega esta línea -->
+          </span>
+          <button type="button" class="personas-btn" onclick="cambiarPersonasEdit(1)">+</button>
         </div>
+        <input type="hidden" id="edit-personas-input" value="1">
+      </div>
 
         <!-- Método de pago -->
         <div class="form-section">
@@ -667,7 +678,14 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
           </div>
         </div>
 
-        <button type="submit" class="btn-confirmar">Actualizar Reserva</button>
+        <!-- Botón guardar mejorado -->
+        <button type="submit" class="btn-guardar-edit">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
+          <span>Guardar cambios</span>
+      </button>
+
       </form>
     </div>
   </div>
@@ -834,65 +852,191 @@ function showToast(icon, title, sub, duration = 4000) {
   setTimeout(() => t.classList.remove('show'), duration);
 }
 
-// ── Editar ────────────────────────────────────────────────────
+
+// ── Editar con calendario + validaciones ──────────────────────
+let editViewDate    = new Date();
+let editFechaInicio = null;
+let editFechaFin    = null;
+let editMaxPersonas = 10;
+
 function editarReserva(id) {
-  // Buscar la fila de la reserva por id
-  let fila = document.querySelector(`.res-row[data-id='${id}']`);
-  if (!fila) {
-    // Si es móvil, buscar la card
-    fila = document.querySelector(`.mob-card[data-id='${id}']`);
-    if (!fila) {
-      showToast('⚠️', 'No encontrado', `No se encontró la reserva ${id}`);
-      return;
-    }
+  const fila = document.querySelector(`.res-row[data-id='${id}']`);
+  if (!fila) { showToast('⚠️', 'Error', 'Reserva no encontrada'); return; }
+
+  const celdas = fila.querySelectorAll('td');
+
+  // Imagen y título
+  document.getElementById('edit-img').src            = celdas[0].querySelector('img').src;
+  document.getElementById('edit-tipo').textContent   = celdas[0].querySelector('.hab-tipo').textContent;
+  document.getElementById('edit-title').textContent  = celdas[0].querySelector('.hab-nombre').textContent;
+
+  // Fechas ISO desde data-iso
+  const fechaVals  = celdas[1].querySelectorAll('.fecha-val');
+  const entradaISO = fechaVals[0]?.getAttribute('data-iso') || '';
+  const salidaISO  = fechaVals[1]?.getAttribute('data-iso') || '';
+
+  // Personas actuales y máximo
+  const personasActuales = parseInt(celdas[2].querySelector('.personas-num').textContent) || 1;
+  editMaxPersonas = parseInt(fila.getAttribute('data-max-personas')) || 10;
+  console.log('Max personas:', editMaxPersonas, '| data-max-personas:', fila.getAttribute('data-max-personas'));
+
+  // Pago
+  const pagoTexto = celdas[3].textContent.trim().toLowerCase();
+  if (pagoTexto.includes('nequi'))         document.getElementById('edit-pago-nequi').checked = true;
+  else if (pagoTexto.includes('daviplata')) document.getElementById('edit-pago-daviplata').checked = true;
+  else                                      document.getElementById('edit-pago-bancolombia').checked = true;
+
+  // Inicializar personas
+  const pNum = Math.min(personasActuales, editMaxPersonas);
+  document.getElementById('edit-personas-num').textContent    = pNum;
+  document.getElementById('edit-personas-input').value        = pNum;
+  document.getElementById('edit-personas-plural').style.display = pNum > 1 ? 'inline' : 'none';
+
+  // ← agrega esto para mostrar el hint al abrir
+  const hint = document.getElementById('edit-personas-hint');
+  if (hint) {
+    hint.textContent = `Máximo permitido: ${editMaxPersonas} persona${editMaxPersonas > 1 ? 's' : ''}`;
   }
 
-  // Obtener datos de la fila
-  let habNombre, habTipo, habImg, entrada, salida, personas, pago;
-
-  if (fila.classList.contains('res-row')) {
-    const celdas = fila.querySelectorAll('td');
-    habNombre = celdas[0].querySelector('.hab-nombre').textContent;
-    habTipo = celdas[0].querySelector('.hab-tipo').textContent;
-    habImg = celdas[0].querySelector('img').src;
-    const fechas = celdas[1].querySelectorAll('.fecha-val');
-    entrada = fechas[0].textContent;
-    salida = fechas[1].textContent;
-    personas = celdas[2].querySelector('.personas-num').textContent;
-    pago = celdas[3].textContent.trim();
-  } else {
-    // Móvil
-    habNombre = fila.querySelector('.hab-nombre').textContent;
-    habTipo = fila.querySelector('.hab-tipo').textContent;
-    habImg = fila.querySelector('img').src;
-    entrada = fila.querySelector('.fecha-entrada').textContent;
-    salida = fila.querySelector('.fecha-salida').textContent;
-    personas = fila.querySelector('.personas-num').textContent;
-    pago = fila.querySelector('.pago-val').textContent.trim();
-  }
-
-  // Llenar el modal de edición
-  document.getElementById('edit-img').src = habImg;
-  document.getElementById('edit-tipo').textContent = habTipo;
-  document.getElementById('edit-title').textContent = habNombre;
+  // Inicializar calendario
   document.getElementById('edit-reserva-id').value = id;
-  document.getElementById('edit-fecha-inicio').value = entrada;
-  document.getElementById('edit-fecha-fin').value = salida;
-  document.getElementById('edit-personas-num').textContent = personas;
-  document.getElementById('edit-personas-input').value = personas;
-  document.getElementById('edit-personas-plural').style.display = personas > 1 ? 'inline' : 'none';
+  editFechaInicio = entradaISO || null;
+  editFechaFin    = salidaISO  || null;
+  editViewDate    = editFechaInicio
+    ? new Date(editFechaInicio + 'T12:00:00')
+    : new Date();
 
-  // Método de pago
-  const pagoLower = pago.toLowerCase();
-  if (pagoLower.includes('nequi')) document.getElementById('edit-pago-nequi').checked = true;
-  else if (pagoLower.includes('daviplata')) document.getElementById('edit-pago-daviplata').checked = true;
-  else if (pagoLower.includes('bancolombia')) document.getElementById('edit-pago-bancolombia').checked = true;
+  renderizarCalendarioEdit();
+  actualizarTextoFechasEdit();
 
-  // Abrir el modal
   document.getElementById('modalEditar').classList.add('open');
   document.body.style.overflow = 'hidden';
-  showToast('✏️', 'Editar reserva', `Editando reserva #${id}`);
 }
+
+function cambiarMesEdit(delta) {
+  editViewDate.setMonth(editViewDate.getMonth() + delta);
+  renderizarCalendarioEdit();
+}
+
+function renderizarCalendarioEdit() {
+  const grid  = document.getElementById('edit-cal-grid');
+  const label = document.getElementById('edit-cal-month-label');
+  if (!grid || !label) return;
+
+  grid.innerHTML = '';
+  const year  = editViewDate.getFullYear();
+  const month = editViewDate.getMonth();
+  const monthName = new Intl.DateTimeFormat('es-ES', {month:'long', year:'numeric'}).format(editViewDate);
+  label.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+  const firstDay  = new Date(year, month, 1).getDay();
+  const totalDays = new Date(year, month + 1, 0).getDate();
+
+  // Hoy a medianoche para comparar
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < firstDay; i++) {
+    const blank = document.createElement('div');
+    blank.className = 'cal-cell cal-blank';
+    grid.appendChild(blank);
+  }
+
+  for (let d = 1; d <= totalDays; d++) {
+    const dateObj = new Date(year, month, d);
+    const dateStr = dateObj.toISOString().split('T')[0];
+    const div = document.createElement('div');
+    div.className = 'cal-cell';
+    div.textContent = d;
+
+    // ✅ Validación 1: bloquear fechas pasadas
+    if (dateObj < today) {
+      div.classList.add('cal-past');
+      div.title = 'Fecha no disponible';
+    } else {
+      div.onclick = () => seleccionarFechaEdit(dateStr);
+
+      if (dateStr === editFechaInicio) div.classList.add('cal-start');
+      if (dateStr === editFechaFin)    div.classList.add('cal-end');
+      if (editFechaInicio && editFechaFin && dateStr > editFechaInicio && dateStr < editFechaFin)
+        div.classList.add('cal-range');
+    }
+    grid.appendChild(div);
+  }
+}
+
+function seleccionarFechaEdit(fecha) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const seleccionada = new Date(fecha + 'T12:00:00');
+
+  // Doble check: no permitir pasadas
+  if (seleccionada < today) {
+    showToast('⛔', 'Fecha no válida', 'No puedes reservar fechas pasadas.');
+    return;
+  }
+
+  if (!editFechaInicio || (editFechaInicio && editFechaFin)) {
+    editFechaInicio = fecha;
+    editFechaFin    = null;
+  } else if (fecha > editFechaInicio) {
+    editFechaFin = fecha;
+  } else {
+    // Si selecciona antes del inicio, reinicia
+    editFechaInicio = fecha;
+    editFechaFin    = null;
+  }
+
+  document.getElementById('edit-fecha-inicio').value = editFechaInicio || '';
+  document.getElementById('edit-fecha-fin').value    = editFechaFin    || '';
+  renderizarCalendarioEdit();
+  actualizarTextoFechasEdit();
+}
+
+function actualizarTextoFechasEdit() {
+  const cont = document.getElementById('edit-fechas-texto');
+  if (!cont) return;
+  if (editFechaInicio && editFechaFin) {
+    const noches = Math.round(
+      (new Date(editFechaFin) - new Date(editFechaInicio)) / 86400000
+    );
+    cont.innerHTML = `
+      <span class="fecha-chip entrada">✈️ ${editFechaInicio}</span>
+      <span class="fecha-chip salida">🏁 ${editFechaFin}</span>
+      <span class="noches-badge">${noches} noche${noches !== 1 ? 's' : ''}</span>`;
+  } else if (editFechaInicio) {
+    cont.innerHTML = `<span class="fecha-chip entrada">✈️ ${editFechaInicio}</span>
+      <span class="fecha-chip-hint">Ahora selecciona la salida</span>`;
+  } else {
+    cont.innerHTML = `<span class="fecha-chip-hint">Selecciona entrada y salida</span>`;
+  }
+}
+
+// ✅ Validación 2: máximo de personas por habitación
+function cambiarPersonasEdit(delta) {
+  const input   = document.getElementById('edit-personas-input');
+  const display = document.getElementById('edit-personas-num');
+  const plural  = document.getElementById('edit-personas-plural');
+  const hint    = document.getElementById('edit-personas-hint');
+
+  let num = parseInt(input.value) + delta;
+  num = Math.max(1, Math.min(editMaxPersonas, num));
+
+  input.value = num;
+  display.textContent = num;
+  plural.style.display = num > 1 ? 'inline' : 'none';
+
+  if (hint) {
+    if (num >= editMaxPersonas) {
+      hint.textContent = `Máximo ${editMaxPersonas} persona${editMaxPersonas > 1 ? 's' : ''}`;
+      hint.classList.add('personas-hint--max');
+    } else {
+      hint.textContent = `Máximo permitido: ${editMaxPersonas} personas`;
+      hint.classList.remove('personas-hint--max');
+    }
+  }
+}
+
 
 function cerrarEditar(event, forzar) {
   if (forzar || (event && event.target === document.getElementById('modalEditar'))) {
@@ -901,49 +1045,54 @@ function cerrarEditar(event, forzar) {
   }
 }
 
-function cambiarPersonasEdit(delta) {
-  const input = document.getElementById('edit-personas-input');
-  const display = document.getElementById('edit-personas-num');
-  const plural = document.getElementById('edit-personas-plural');
-  let num = parseInt(input.value) + delta;
-  num = Math.max(1, num); // Min 1
-  input.value = num;
-  display.textContent = num;
-  plural.style.display = num > 1 ? 'inline' : 'none';
-}
-
-// Submit del form editar
+// Submit con validaciones finales antes de enviar
 document.getElementById('formEditar').addEventListener('submit', function(e) {
   e.preventDefault();
-  const id = document.getElementById('edit-reserva-id').value;
+
+  const id         = document.getElementById('edit-reserva-id').value;
   const fechaInicio = document.getElementById('edit-fecha-inicio').value;
-  const fechaFin = document.getElementById('edit-fecha-fin').value;
-  const personas = document.getElementById('edit-personas-input').value;
-  const pago = document.querySelector('input[name="pago_edit"]:checked').value;
+  const fechaFin    = document.getElementById('edit-fecha-fin').value;
+  const personas    = parseInt(document.getElementById('edit-personas-input').value);
+  const pago        = document.querySelector('input[name="pago_edit"]:checked').value;
+
+  // Validar fechas seleccionadas
+  if (!fechaInicio || !fechaFin) {
+    showToast('⚠️', 'Fechas incompletas', 'Selecciona fecha de entrada y salida.');
+    return;
+  }
+
+  // Validar que no sean pasadas
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  if (new Date(fechaInicio + 'T12:00:00') < hoy) {
+    showToast('⛔', 'Fecha inválida', 'La fecha de entrada no puede ser en el pasado.');
+    return;
+  }
+
+  // Validar personas
+  if (personas < 1 || personas > editMaxPersonas) {
+    showToast('⚠️', 'Personas inválidas',
+      `Debe ser entre 1 y ${editMaxPersonas} persona${editMaxPersonas > 1 ? 's' : ''}.`);
+    return;
+  }
 
   fetch('index.php?action=actualizarReserva', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: `reserva_id=${id}&fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}&personas=${personas}&pago_edit=${pago}`
   })
-  .then(response => response.json())
+  .then(r => r.json())
   .then(data => {
     if (data.status === 'success') {
       cerrarEditar(null, true);
-      showToast('✅', 'Reserva actualizada', `Reserva #${id} actualizada correctamente.`);
-      // Recargar la página para mostrar cambios
+      showToast('✅', 'Reserva actualizada', `Reserva #${id} guardada correctamente.`);
       setTimeout(() => location.reload(), 1500);
     } else {
       showToast('❌', 'Error', 'No se pudo actualizar la reserva.');
     }
   })
-  .catch(error => {
-    console.error('Error:', error);
-    showToast('❌', 'Error', 'Error de conexión.');
-  });
+  .catch(() => showToast('❌', 'Error', 'Error de conexión.'));
 });
+
 
 // ── Descargar ─────────────────────────────────────────────────
 function descargarReserva(id, hab, entrada, salida, total, pago) {
