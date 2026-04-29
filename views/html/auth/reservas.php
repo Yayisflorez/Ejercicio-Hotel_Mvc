@@ -37,8 +37,8 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mis Reservas · Hotel Viña del Mar</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/homes2.css"/>
-  <link rel="stylesheet" href="css/reservas.css"/>
+  <link rel="stylesheet" href="css/home2.css"/>
+  <link rel="stylesheet" href="css/reserva.css"/>
   <link rel="icon" href="img/recurso.png" type="image/png"/>
 </head>
 <body>
@@ -524,7 +524,7 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
         <!-- Seleccionar habitación -->
         <div class="form-section">
           <p class="form-section-title">🏨 Habitación específica</p>
-          <select id="select-habitacion" class="form-select" onchange="cambiarHabitacion()">
+          <select id="select-habitacion" class="form-select" onchange="cambiarHabitacion()" disabled>
             <option value="">Primero selecciona una categoría</option>
           </select>
         </div>
@@ -1286,7 +1286,7 @@ async function cambiarCategoria() {
     try {
 
         const response = await fetch(
-            'model/habitacion.php?action=getHabitacionesByCategoria'
+            `model/Habitacion.php?action=getHabitacionesByCategoria&categoria=${encodeURIComponent(categoria)}`
         );
 
         const result = await response.json();
@@ -1301,7 +1301,7 @@ async function cambiarCategoria() {
             option.textContent = `${hab.nombre} - ${hab.descripcion}`;
 
             option.dataset.precio = hab.precio;
-            option.dataset.img = hab.img;
+            option.dataset.img = hab.img ? hab.img : 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80';
             option.dataset.maxpersonas = hab.max_personas;
 
             selectHab.appendChild(option);

@@ -24,7 +24,9 @@ if (isset($_GET['action']) && $_GET['action'] == 'getHabitacionesByCategoria') {
 
     $categoria = $_GET['categoria'] ?? '';
 
-    $conn = Conexion::conectar();
+    $conn = new conexion();
+    $conn->conectar();
+    $conn = $conn->getConexion();
 
     $habitaciones = [];
 
@@ -32,10 +34,9 @@ if (isset($_GET['action']) && $_GET['action'] == 'getHabitacionesByCategoria') {
 
         $sql = "SELECT 
                     h.id,
-                    h.nombre,
+                    h.num_habitacion AS nombre,
                     h.descripcion,
                     h.precio,
-                    h.img,
                     h.max_personas
                 FROM habitaciones h
                 INNER JOIN categorias c ON h.id_categoria = c.id
