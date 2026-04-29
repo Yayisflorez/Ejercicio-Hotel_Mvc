@@ -524,7 +524,7 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
         <!-- Seleccionar habitación -->
         <div class="form-section">
           <p class="form-section-title">🏨 Habitación específica</p>
-          <select id="select-habitacion" class="form-select" onchange="cambiarHabitacion()" disabled>
+          <select id="select-habitacion" class="form-select" onchange="cambiarHabitacion()">
             <option value="">Primero selecciona una categoría</option>
           </select>
         </div>
@@ -1273,51 +1273,58 @@ function cerrarModalNuevaReserva(event, forzar) {
     }
 }
 
-function cambiarCategoria() {
+async function cambiarCategoria() {
+
     const categoria = document.getElementById('select-categoria').value;
     const selectHab = document.getElementById('select-habitacion');
+
     selectHab.innerHTML = '<option value="">Selecciona una habitación</option>';
-    if (categoria) {
-        const habsFiltradas = habitaciones.filter(h => h.categoria_nombre === categoria);
-        habsFiltradas.forEach(h => {
+    selectHab.disabled = true;
+
+    if (!categoria) return;
+
+    try {
+
+        const response = await fetch(
+            'model/habitacion.php?action=getHabitacionesByCategoria'
+        );
+
+        const result = await response.json();
+
+        const habitaciones = result.data;
+
+        habitaciones.forEach((hab) => {
+
             const option = document.createElement('option');
-            option.value = h.id;
-            option.textContent = `${h.nombre} - ${h.descripcion}`;
+
+            option.value = hab.id;
+            option.textContent = `${hab.nombre} - ${hab.descripcion}`;
+
+            option.dataset.precio = hab.precio;
+            option.dataset.img = hab.img;
+            option.dataset.maxpersonas = hab.max_personas;
+
             selectHab.appendChild(option);
         });
+
         selectHab.disabled = false;
-    } else {
-        selectHab.disabled = true;
+
+    } catch (error) {
+        console.log('Error AJAX habitaciones');
+        console.error(error);
     }
-    cambiarHabitacion(); // Reset
+
+    cambiarHabitacion();
+
 }
 
 function cambiarHabitacion() {
-    const habId = document.getElementById('select-habitacion').value;
-    const hab = habitaciones.find(h => h.id == habId);
-    if (hab) {
-        document.getElementById('modal-nueva-img').src = hab.img || 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80';
-        document.getElementById('modal-nueva-title').textContent = hab.nombre;
-        document.getElementById('modal-nueva-precio-noche').textContent = '$' + hab.precio.toLocaleString();
-        document.getElementById('res-nueva-nombre').textContent = hab.nombre;
-        document.getElementById('input-nueva-hab-id').value = hab.id;
-        document.getElementById('input-nueva-precio-hidden').value = hab.precio;
-        precioNuevaActual = hab.precio;
-        // Activar el selector de personas cuando hay habitación
-        actualizarPersonasNuevaControls();
-        // Validar max personas
-        const maxPersonas = hab.max_personas;
-        const currentPersonas = parseInt(document.getElementById('personas-nueva-input').value);
-        if (currentPersonas > maxPersonas) {
-            document.getElementById('personas-nueva-num').textContent = maxPersonas;
-            document.getElementById('personas-nueva-input').value = maxPersonas;
-            document.getElementById('personas-nueva-plural').style.display = maxPersonas > 1 ? 'inline' : 'none';
-            document.getElementById('personas-nueva-hint').textContent = `Máximo ${maxPersonas} persona${maxPersonas > 1 ? 's' : ''}`;
-            showToast('⚠️', 'Máximo de personas', `Esta habitación permite máximo ${maxPersonas} persona${maxPersonas > 1 ? 's' : ''}.`);
-        } else {
-            document.getElementById('personas-nueva-hint').textContent = fechaNuevaInicio && fechaNuevaFin ? 'Ajusta el número de personas' : 'Selecciona fechas para continuar';
-        }
-    } else {
+    const selectHab = document.getElementById('select-habitacion');
+    const selectedOption = selectHab.options[selectHab.selectedIndex];
+    const habId = selectHab.value;
+
+    if (!habId || !selectedOption) {
+        // Sin selección: resetear UI
         document.getElementById('modal-nueva-img').src = 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80';
         document.getElementById('modal-nueva-title').textContent = 'Selecciona tu habitación';
         document.getElementById('modal-nueva-precio-noche').textContent = '—';
@@ -1325,7 +1332,40 @@ function cambiarHabitacion() {
         document.getElementById('input-nueva-hab-id').value = '';
         document.getElementById('input-nueva-precio-hidden').value = '';
         precioNuevaActual = 0;
+        actualizarPersonasNuevaControls();
+        calcularTotalNueva();
+        return;
     }
+
+    // Leer datos desde el dataset del <option> (guardados por el AJAX)
+    const precio     = parseFloat(selectedOption.dataset.precio) || 0;
+    const img        = selectedOption.dataset.img || '';
+    const maxPersonas = parseInt(selectedOption.dataset.maxpersonas) || 1;
+    const nombre     = selectedOption.textContent.split(' - ')[0]; // extrae solo el nombre
+
+    document.getElementById('modal-nueva-img').src = img || 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80';
+    document.getElementById('modal-nueva-title').textContent = nombre;
+    document.getElementById('modal-nueva-precio-noche').textContent = '$' + precio.toLocaleString();
+    document.getElementById('res-nueva-nombre').textContent = nombre;
+    document.getElementById('input-nueva-hab-id').value = habId;
+    document.getElementById('input-nueva-precio-hidden').value = precio;
+    precioNuevaActual = precio;
+
+    // Validar personas
+    const currentPersonas = parseInt(document.getElementById('personas-nueva-input').value);
+    if (currentPersonas > maxPersonas) {
+        document.getElementById('personas-nueva-num').textContent = maxPersonas;
+        document.getElementById('personas-nueva-input').value = maxPersonas;
+        document.getElementById('personas-nueva-plural').style.display = maxPersonas > 1 ? 'inline' : 'none';
+        document.getElementById('personas-nueva-hint').textContent = `Máximo ${maxPersonas} persona${maxPersonas > 1 ? 's' : ''}`;
+        showToast('⚠️', 'Máximo de personas', `Esta habitación permite máximo ${maxPersonas} persona${maxPersonas > 1 ? 's' : ''}.`);
+    } else {
+        document.getElementById('personas-nueva-hint').textContent = fechaNuevaInicio && fechaNuevaFin
+            ? 'Ajusta el número de personas'
+            : 'Selecciona fechas para continuar';
+    }
+
+    actualizarPersonasNuevaControls();
     calcularTotalNueva();
 }
 
