@@ -778,107 +778,144 @@ body {
   font-family: "Jost", sans-serif;
 }
 
-/* ── MODAL BORRAR ──────────────────────────────────────────── */
-.modal-del-backdrop {
+/* ── MODAL BORRAR (Rediseñado Premium) ─────────────────────── */
+.modal-backdrop {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(5, 12, 22, 0.8);
-  backdrop-filter: blur(8px);
+  background: rgba(5, 12, 22, 0.85);
+  backdrop-filter: blur(10px);
   align-items: center;
   justify-content: center;
   padding: 1rem;
 }
-.modal-del-backdrop.open {
+
+.modal-backdrop.open {
   display: flex;
 }
 
-.modal-del-box {
-  background: var(--navy-card);
-  border: 1px solid rgba(248, 113, 113, 0.3);
-  max-width: 380px;
+.modal-del {
   width: 100%;
-  padding: 2.5rem 2rem;
-  text-align: center;
-  animation: modalIn 0.3s ease forwards;
+  max-width: 460px;
+  background: #0f1c2b;
+  border: 1px solid rgba(201, 169, 110, 0.2);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  animation: modalIn 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
 }
 
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.modal-del-header {
+  padding: 3rem 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.modal-del-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+.modal-del-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
+
+.modal-del-icon-wrapper svg {
+  width: 40px !important;
+  height: 40px !important;
+}
+
 .modal-del-title {
   font-family: "Cormorant Garamond", serif;
-  font-size: 1.6rem;
+  font-size: 2.4rem;
   font-weight: 300;
+  color: #fff;
+  margin: 0;
+}
+
+.modal-del-body {
+  padding: 0 2.5rem 2rem;
+  text-align: center;
+}
+
+.modal-del-text {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.75rem;
 }
-.modal-del-msg {
-  font-size: 0.82rem;
-  color: var(--w60);
-  line-height: 1.6;
-  margin-bottom: 1.75rem;
-}
-.modal-del-msg strong {
+
+.res-id-highlight {
   color: var(--gold);
+  font-weight: 600;
 }
 
-.modal-del-btns {
+.modal-del-subtext {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.6;
+}
+
+.modal-del-footer {
+  padding: 1.5rem 2.5rem 3rem;
   display: flex;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.btn-del-cancel {
-  flex: 1;
-  padding: 0.75rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.btn-modal-keep {
+  width: 100%;
+  padding: 1.1rem;
+  background: var(--gold);
+  color: var(--navy-deep);
+  border: none;
   font-family: "Jost", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-modal-keep:hover {
+  background: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-modal-confirm {
+  width: 100%;
+  padding: 1.1rem;
   background: transparent;
-  border: 1px solid var(--w20);
-  color: var(--w60);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-family: "Jost", sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    border-color 0.2s;
-}
-.btn-del-cancel:hover {
-  background: var(--w05);
-  border-color: var(--w40);
+  transition: all 0.25s ease;
 }
 
-.btn-del-confirm {
-  flex: 1;
-  padding: 0.75rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-family: "Jost", sans-serif;
-  background: rgba(248, 113, 113, 0.15);
-  border: 1px solid rgba(248, 113, 113, 0.5);
-  color: var(--red);
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    border-color 0.2s;
+.btn-modal-confirm:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #f87171;
 }
-.btn-del-confirm:hover {
-  background: rgba(248, 113, 113, 0.25);
-  border-color: var(--red);
+
+@media (min-width: 640px) {
+  .modal-del-footer {
+    flex-direction: row-reverse;
+  }
+  .btn-modal-keep, .btn-modal-confirm {
+    flex: 1;
+  }
 }
+
 
 /* ── TOAST ─────────────────────────────────────────────────── */
 .toast {

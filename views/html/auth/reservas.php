@@ -1,9 +1,10 @@
-﻿<?php
+<?php
 // ============================================================
 // reservas.php — Gestión de reservas del usuario autenticado
 // ============================================================
 
 require_once "controller/HabitacionesController.php";
+require_once "controller/ReservasController.php";
 $id_user = $_SESSION['usuario']['id'] ?? null;
 $habitaciones_lista = HabitacionesController::obtenerHabitaciones();
 $reservas = $id_user ? ReservasController::obtenerReservasPorUsuario($id_user) : [];
@@ -208,7 +209,6 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
                 <div>
                   <p class="hab-nombre">Habitación <?= htmlspecialchars($r['habitacion']) ?></p>
                   <span class="hab-tipo"><?= htmlspecialchars($r['tipo']) ?></span>
-                  <span class="res-id">#<?= $r['id'] ?></span>
                 </div>
               </div>
             </td>
@@ -730,19 +730,35 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
 </div>
 
 <!-- ============================================================
-  MODAL DE BORRAR
+  MODAL DE BORRAR (REDISEÑADO)
 ============================================================ -->
-<div id="modalDel" class="modal-backdrop" onclick="cerrarModalDel()">
-  <div class="modal-box modal-del" role="dialog" aria-modal="true">
-    <div class="modal-del-icon">⚠️</div>
-    <h3 class="modal-del-title">¿Cancelar reserva?</h3>
-    <p class="modal-del-msg">
-      Estás a punto de cancelar la reserva <strong id="del-id"></strong>.<br>
-      Esta acción no se puede deshacer.
-    </p>
-    <div class="modal-del-actions">
-      <button class="btn-del-cancel" onclick="cerrarModalDel()">Mantener</button>
-      <button class="btn-del-confirm" onclick="ejecutarBorrar()">Cancelar Reserva</button>
+<div id="modalDel" class="modal-backdrop" onclick="cerrarModalDel(event)">
+  <div class="modal-box modal-del" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="modal-del-header">
+      <div class="modal-del-icon-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h3 class="modal-del-title">Confirmar Cancelación</h3>
+    </div>
+    
+    <div class="modal-del-body">
+      <p class="modal-del-text">
+        Estás a punto de cancelar la reserva <span class="res-id-highlight">#<span id="del-id"></span></span>.
+      </p>
+      <p class="modal-del-subtext">
+        Esta acción liberará la habitación y no podrá ser revertida de forma automática.
+      </p>
+    </div>
+
+    <div class="modal-del-footer">
+      <button class="btn-modal-keep" onclick="cerrarModalDel()">
+        Mantener mi reserva
+      </button>
+      <button class="btn-modal-confirm" onclick="ejecutarBorrar()">
+        Sí, cancelar reserva
+      </button>
     </div>
   </div>
 </div>
