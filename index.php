@@ -27,6 +27,11 @@
             $registerController->registrar();
         }
 
+        // PROCESAR REGISTRO AJAX
+        if($_GET['action'] == 'registerUserAjax'){ 
+            $registerController->registrarAjax();
+        }
+
         // FORMULARIO DE LOGIN
         if($_GET['action'] == 'getFormLoginUser'){
             $baseController->verPagina('views/html/auth/login.php');
@@ -63,6 +68,10 @@
 
         if($_GET['action'] == 'eliminarReserva' && $_SERVER['REQUEST_METHOD'] === 'POST'){
             $reservasController->eliminarReservaAjax();
+        }
+
+        if($_GET['action'] == 'descargarPdfReserva'){
+            $reservasController->descargarPdfReserva();
         }
 
         // CERRAR SESIÓN

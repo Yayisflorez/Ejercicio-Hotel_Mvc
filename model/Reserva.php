@@ -7,12 +7,16 @@ class Reserva {
         $conexion->conectar();
         $sql = "SELECT 
                     r.id, 
+                    r.id_habitacion,
+                    h.precio AS precio_noche,
                     r.fecha_inicio AS entrada, 
                     r.fecha_final AS salida, 
                     r.num_personas AS personas, 
                     r.estado, 
                     r.precio AS total, 
+                    r.created_at,
                     h.max_personas,
+                    h.descripcion,
                     h.num_habitacion AS habitacion, 
                     c.nombre AS tipo, 
                     m.nombre AS pago,
@@ -46,9 +50,9 @@ class Reserva {
     public static function actualizarReserva($data) {
         $conexion = new Conexion();
         $conexion->conectar();
-        $sql = "UPDATE reservas SET fecha_inicio = ?, fecha_final = ?, num_personas = ?, id_metodo_pago = ?, updated_at = NOW() WHERE id = ?";
+        $sql = "UPDATE reservas SET id_habitacion = ?, precio = ?, fecha_inicio = ?, fecha_final = ?, num_personas = ?, id_metodo_pago = ?, updated_at = NOW() WHERE id = ?";
         $stmt = $conexion->getConexion()->prepare($sql);
-        $stmt->bind_param("ssiii", $data['fecha_inicio'], $data['fecha_fin'], $data['personas'], $data['id_metodo_pago'], $data['id']);
+        $stmt->bind_param("idssiii", $data['id_habitacion'], $data['precio'], $data['fecha_inicio'], $data['fecha_fin'], $data['personas'], $data['id_metodo_pago'], $data['id']);
         $ok = $stmt->execute();
         $stmt->close();
         $conexion->cerrar();
