@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ScriptReservas.js
  * 
  * Propósito:
@@ -267,7 +267,10 @@ function cambiarHabitacionEdit() {
   const selectedOption = selectHab.options[selectHab.selectedIndex];
   const habId = selectHab.value;
 
-  if (!habId || !selectedOption) {
+
+  const noHayHabitacion = (habId === "" || selectedOption === undefined);
+
+  if (noHayHabitacion) {
     document.getElementById('edit-img').src = 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80';
     document.getElementById('edit-title').textContent = 'Selecciona tu habitación';
     document.getElementById('res-edit-nombre').textContent = '—';
