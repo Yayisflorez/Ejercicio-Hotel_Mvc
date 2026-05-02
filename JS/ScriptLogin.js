@@ -1,15 +1,4 @@
-/**
- * ScriptLogin.js
- * 
- * Propósito:
- * Este archivo contiene la lógica de validación para el formulario de inicio de sesión (login.php).
- * Incluye las siguientes funcionalidades:
- * - Event listener para el envío del formulario.
- * - Validación del formato de correo electrónico.
- * - Validación de la longitud mínima de la contraseña (8 caracteres).
- * - Mostrar u ocultar mensajes de error específicos para cada campo.
- * - Prevenir el envío del formulario al servidor si no se cumplen las reglas.
- */
+
 
 document.addEventListener('DOMContentLoaded', function() {
   const loginForm = document.getElementById('loginForm');

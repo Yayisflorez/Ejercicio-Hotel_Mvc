@@ -1,17 +1,4 @@
-/**
- * ScriptRegister.js
- * 
- * Propósito:
- * Este archivo contiene la lógica de validación para el formulario de registro de nuevos usuarios (register.php).
- * Incluye las siguientes funcionalidades:
- * - Event listener principal para el envío del formulario.
- * - Limpieza dinámica de los mensajes de error mostrados previamente.
- * - Validación de campos obligatorios: tipo de documento, número, nombre, apellido y teléfono.
- * - Validación del formato correcto de correo electrónico.
- * - Comprobación de "contraseña fuerte": mínimo 8 caracteres, al menos una mayúscula y un número.
- * - Verificación de coincidencia entre "Contraseña" y "Confirmar Contraseña".
- * - Bloqueo del envío de datos al servidor en caso de existir algún error de validación en el cliente.
- */
+
 
 document.addEventListener('DOMContentLoaded', function() {
   const regForm = document.getElementById('regForm');

@@ -1,19 +1,4 @@
-/**
- * ScriptReservas.js
- *
- * Propósito:
- * Este archivo contiene la lógica dinámica de la página de "Mis Reservas" (reservas.php).
- * Incluye las siguientes funcionalidades:
- * - Menú hamburguesa y navegación móvil.
- * - Lógica del modal de "Editar Reserva", incluyendo el calendario, validación de estado para habilitar el botón de guardado, y selección dinámica de habitaciones.
- * - Lógica del modal de "Nueva Reserva", donde se listan las categorías, se cargan habitaciones por AJAX y se limita el máximo de personas.
- * - Renderizado de calendarios interactivos para elegir fechas de inicio y fin.
- * - Cálculo automático de cantidad de noches y precio total estimado en base a la habitación.
- * - Generación y descarga de recibos PDF para cada reserva individual.
- * - Generación de un reporte general (archivo de texto) con todas las reservas.
- * - Lógica para cancelar/eliminar reservas mediante AJAX y confirmación visual.
- * - Sistema de notificaciones integradas (Toasts) para el usuario.
- */
+
 // ── Hamburguesa ───────────────────────────────────────────────
 const hamburger = document.getElementById("hamburger");
 const mobileMenu = document.getElementById("mobileMenu");
@@ -706,41 +691,12 @@ function generarReporte() {
     return;
   }
 
-  const hoy = new Date().toLocaleDateString("es-CO");
-  let lineas = [
-    "╔══════════════════════════════════════════════════╗",
-    "║       HOTEL VIÑA DEL MAR — REPORTE GENERAL       ║",
-    "╚══════════════════════════════════════════════════╝",
-    `  Generado: ${hoy}`,
-    `  Total de reservas: ${filas.length}`,
-    "",
-    "──────────────────────────────────────────────────",
-  ];
-
-  filas.forEach((fila) => {
-    const celdas = fila.querySelectorAll("td");
-    lineas.push(
-      `  ${fila.dataset.id}  |  ` +
-        celdas[0]?.querySelector(".hab-nombre")?.textContent?.trim() +
-        "  |  " +
-        celdas[1]?.querySelector(".fecha-val")?.textContent?.trim() +
-        "  |  " +
-        celdas[4]?.textContent?.trim(),
-    );
-  });
-
-  lineas.push("", "══════════════════════════════════════════════════");
-
-  const blob = new Blob([lineas.join("\n")], {
-    type: "text/plain;charset=utf-8",
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `Reporte-Reservas-${hoy}.txt`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast("📊", "Reporte descargado", `Reporte general generado el ${hoy}.`);
+  showToast("📊", "Generando Excel", "Preparando reporte general de reservas...");
+  
+  // Redirigir al generador de Excel
+  setTimeout(() => {
+    window.location.href = "Reportes/reporteGeneral.php";
+  }, 1000);
 }
 
 // Cerrar modal borrar al click fuera

@@ -1,19 +1,4 @@
-/**
- * ScriptHome2.js
- * 
- * Propósito:
- * Este archivo contiene la lógica de interacción para la página principal del huésped (home2.php).
- * Incluye las siguientes funcionalidades:
- * - Manejo del menú hamburguesa y navegación móvil.
- * - Resaltado dinámico del menú de navegación al hacer scroll por las secciones (Intersection Observer).
- * - Lógica del modal para "Reservar Habitación" desde la página de inicio, incluyendo:
- *   - Renderizado del calendario interactivo para selección de fechas de estadía.
- *   - Cálculo automático de la cantidad de noches y del costo total.
- *   - Control del contador de huéspedes (respetando la capacidad máxima de la habitación).
- *   - Actualización visual de la opción de método de pago seleccionada.
- *   - Validación estricta del formulario para asegurar que todos los datos estén presentes antes de enviar.
- * - Sistema de notificaciones emergentes (Toast) para mensajes al usuario.
- */
+
 
 // Menú hamburguesa
 const hamburger   = document.getElementById('hamburger');
