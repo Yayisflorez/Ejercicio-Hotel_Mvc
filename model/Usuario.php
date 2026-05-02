@@ -28,6 +28,23 @@ class Usuario
         return $result->fetch_assoc();
     }
 
+    // Buscar usuario por ID (incluye tipo de documento)
+    public function obtenerPorId($id)
+    {
+        $sql = "SELECT u.*, t.tipo AS tipo_documento 
+                FROM usuarios u 
+                LEFT JOIN tipos_documento t ON u.tipo_documento_id = t.id 
+                WHERE u.id = ?";
+        $stmt = $this->conexion->prepare($sql);
+        if (!$stmt) {
+            throw new Exception('Error de preparación: ' . $this->conexion->error);
+        }
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_assoc();
+    }
+
     // Verificar si el email ya existe
     public function emailExiste($email)
     {
