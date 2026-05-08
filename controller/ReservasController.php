@@ -123,5 +123,27 @@ class ReservasController {
         include 'Reportes/reportes.php';
         exit;
     }
+
+    public static function descargarExcelReservas() {
+        if (!isset($_SESSION['usuario']['id'])) {
+            header('Location: index.php?action=getFormLoginUser');
+            exit;
+        }
+
+        $id_user = $_SESSION['usuario']['id'];
+        
+        $reservas = self::obtenerReservasPorUsuario($id_user);
+
+        if (empty($reservas)) {
+            echo "No hay reservas para generar el reporte.";
+            exit;
+        }
+
+        $usuarioModel = new Usuario();
+        $usuario = $usuarioModel->obtenerPorId($id_user);
+
+        include 'Reportes/reporteGeneral.php';
+        exit;
+    }
 }
 ?>

@@ -3,7 +3,7 @@ if (!isset($reserva)) {
     die("Error: No se ha proporcionado la información de la reserva para el reporte.");
 }
 
-require_once 'LIB/fpdf.php';
+require_once 'LIB/FPDF/fpdf.php';
 
 $pdf = new FPDF();
 // Establecer el título del documento (cambia el nombre de la pestaña en el navegador)

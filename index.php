@@ -74,6 +74,10 @@
             $reservasController->descargarPdfReserva();
         }
 
+        if($_GET['action'] == 'descargarExcelReservas'){
+            $reservasController->descargarExcelReservas();
+        }
+
         // CERRAR SESIÓN
         if($_GET['action'] == 'cerrarSesion'){ 
             $loginController->cerrarSesion();

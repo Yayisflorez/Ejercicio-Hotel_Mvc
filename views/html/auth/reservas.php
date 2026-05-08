@@ -782,6 +782,6 @@ $pago_icon = ['Bancolombia' => '🏦', 'Nequi' => '💜', 'Daviplata' => '❤️
 // ── Datos de habitaciones ─────────────────────────────────────
 const habitaciones = <?php echo json_encode($habitaciones_lista); ?>;
 </script>
-<script src="js/ScriptReservas.js"></script>
+<script src="js/ScriptReservas.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

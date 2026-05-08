@@ -1,160 +1,301 @@
 <?php
-/**
- * reporteGeneral.php
- * Genera un reporte en Excel de todas las reservas del usuario actual.
- * Utiliza la librería SimpleXLSXGen ubicada en LIB.
- */
-
-session_start();
-
-// Validar sesión
-if (!isset($_SESSION['usuario']['id'])) {
-    die("Error: Debes iniciar sesión para generar el reporte.");
+if (!isset($reservas) || !isset($usuario)) {
+    die("Error: Faltan datos para generar el reporte.");
 }
 
-require_once '../model/Reserva.php';
-require_once '../LIB/SimpleXLSXGen.php';
-require_once '../model/conexion.php';
+require_once 'LIB/SPREADSHEET/vendor/autoload.php';
 
-use Shuchkin\SimpleXLSXGen;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
-$id_user = $_SESSION['usuario']['id'];
+$spreadsheet = new Spreadsheet();
+$sheet = $spreadsheet->getActiveSheet();
+$sheet->setTitle('Mis Reservas');
 
-// Obtener datos detallados del usuario
-$con = new conexion();
-$con->conectar();
-$sql_u = "SELECT u.*, t.tipo AS tipo_documento_nombre 
-          FROM usuarios u 
-          LEFT JOIN tipos_documento t ON u.tipo_documento_id = t.id 
-          WHERE u.id = $id_user";
-$res_u = $con->query($sql_u);
-$usuario = $res_u->fetch_assoc();
-$con->cerrar();
+// Colores Corporativos
+$navy = '0D1B2A';
+$gold = 'C9A96E';
+$darkText = '000000';
+$whiteText = 'FFFFFF';
 
-if (!$usuario) {
-    die("Error al obtener datos del usuario.");
+// --- 1. ENCABEZADOS PRINCIPALES ---
+// Fila 1: Título Principal
+$sheet->setCellValue('A1', '✦ HOTEL VIÑA DEL MAR');
+$sheet->mergeCells('A1:H1');
+$sheet->getStyle('A1')->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'size' => 18,
+        'color' => ['argb' => 'FF' . $gold],
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+    'fill' => [
+        'fillType' => Fill::FILL_SOLID,
+        'startColor' => ['argb' => 'FF' . $navy],
+    ],
+]);
+$sheet->getRowDimension(1)->setRowHeight(35);
+
+// Fila 2: Subtítulo
+$sheet->setCellValue('A2', 'REPORTE GENERAL DE RESERVAS');
+$sheet->mergeCells('A2:H2');
+$sheet->getStyle('A2')->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'size' => 12,
+        'color' => ['argb' => 'FF' . $darkText],
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+    'fill' => [
+        'fillType' => Fill::FILL_SOLID,
+        'startColor' => ['argb' => 'FF' . $gold],
+    ],
+]);
+$sheet->getRowDimension(2)->setRowHeight(22);
+
+// --- 2. SECCIÓN: INFORMACIÓN DEL CLIENTE ---
+// Fila 4: Título Sección Cliente
+$sheet->setCellValue('A4', 'Información del Cliente');
+$sheet->mergeCells('A4:H4');
+$sheet->getStyle('A4')->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'size' => 16,
+        'color' => ['argb' => 'FF' . $navy],
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_LEFT,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+]);
+$sheet->getRowDimension(4)->setRowHeight(25);
+
+// Fila 5: Encabezados Info Cliente
+$infoHeaders = [
+    'A' => 'Usuario',
+    'B' => 'Correo electronico',
+    'C' => 'Tipo de documeto',
+    'D' => 'N° de documeto',
+    'E' => 'Telefono',
+    'F' => 'Fecha de generación',
+    'G' => 'Hora',
+    'H' => 'Total de reservas'
+];
+
+foreach ($infoHeaders as $col => $text) {
+    $sheet->setCellValue($col . '5', $text);
 }
 
-$nombre_completo = $usuario['nombre'] . ' ' . $usuario['apellido'];
-
-// Obtener las reservas del usuario
-$reservas = Reserva::obtenerReservasPorUsuario($id_user);
-
-if (empty($reservas)) {
-    die("No tienes reservas registradas para generar el reporte.");
-}
-
-// Estilos para SimpleXLSXGen
-// Navy: #0D1B2A | Gold: #C9A96E | White: #FFFFFF
-$style_title = '<style bgcolor="#0D1B2A" color="#C9A96E" font-size="16"><b><center>';
-$style_subtitle = '<style bgcolor="#C9A96E" color="#0D1B2A" font-size="12"><b><center>';
-$style_info_header = '<b><center>';
-$style_info_val = '<center>';
-$style_table_header = '<style bgcolor="#0D1B2A" color="#C9A96E" font-size="12"><b><center>';
-$style_total_label = '<style bgcolor="#C9A96E" color="#0D1B2A"><b><right>';
-$style_total_val = '<style bgcolor="#C9A96E" color="#0D1B2A"><b><right>';
-$style_footer = '<style bgcolor="#C9A96E" color="#0D1B2A"><b><center>';
-$cell_money = '<right>';
-
-// Preparar los datos para el Excel (8 columnas: A-H)
-$data = [
-    // Fila 1: Título Principal
-    [
-        $style_title . 'HOTEL VIÑA DEL MAR - REPORTE GENERAL DE RESERVAS</center></b>', 
-        null, null, null, null, null, null, null
+$sheet->getStyle('A5:H5')->applyFromArray([
+    'font' => ['bold' => true, 'size' => 10],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+        'vertical' => Alignment::VERTICAL_CENTER,
     ],
-    // Fila 2: Subtítulo
-    [
-        $style_subtitle . 'Área Personal - Historial de Estadía</center></b>',
-        null, null, null, null, null, null, null
-    ],
-    // Fila 3: Encabezados de información del usuario
-    [
-        $style_info_header . 'Usuario</center></b>',
-        $style_info_header . 'Correo electronico</center></b>',
-        $style_info_header . 'Tipo de documeto</center></b>',
-        $style_info_header . 'N° de documeto</center></b>',
-        $style_info_header . 'Telefono</center></b>',
-        $style_info_header . 'Fecha de generación</center></b>',
-        $style_info_header . 'Hora</center></b>',
-        $style_info_header . 'Total de reservas</center></b>'
-    ],
-    // Fila 4: Valores de información del usuario
-    [
-        $style_info_val . $nombre_completo . '</center>',
-        $style_info_val . $usuario['email'] . '</center>',
-        $style_info_val . $usuario['tipo_documento_nombre'] . '</center>',
-        $style_info_val . $usuario['documento'] . '</center>',
-        $style_info_val . $usuario['telefono'] . '</center>',
-        $style_info_val . date('d/m/Y') . '</center>',
-        $style_info_val . date('H:i:s') . '</center>',
-        $style_info_val . count($reservas) . '</center>'
-    ],
-    // Fila 5: Espaciador
-    [null, null, null, null, null, null, null, null],
-    // Fila 6: Encabezados de la tabla (Sin ID Reserva)
-    [
-        $style_table_header . 'Habitación</center></b>',
-        $style_table_header . 'Tipo</center></b>',
-        $style_table_header . 'Entrada</center></b>',
-        $style_table_header . 'Salida</center></b>',
-        $style_table_header . 'Noches</center></b>',
-        $style_table_header . 'Personas</center></b>',
-        $style_table_header . 'Método de Pago</center></b>',
-        $style_table_header . 'Total</center></b>'
+    'borders' => [
+        'allBorders' => [
+            'borderStyle' => Border::BORDER_THIN,
+            'color' => ['argb' => 'FFDDDDDD'],
+        ],
     ]
+]);
+
+// Fila 6: Valores Info Cliente
+date_default_timezone_set('America/Bogota');
+$sheet->setCellValue('A6', $usuario['nombre'] . ' ' . $usuario['apellido']);
+$sheet->setCellValue('B6', $usuario['email']);
+$sheet->setCellValue('C6', $usuario['tipo_documento']);
+$sheet->setCellValue('D6', $usuario['documento']);
+$sheet->setCellValue('E6', $usuario['telefono']);
+$sheet->setCellValue('F6', date('d/m/Y'));
+$sheet->setCellValue('G6', date('H:i:s'));
+$sheet->setCellValue('H6', count($reservas));
+
+$sheet->getStyle('A6:H6')->applyFromArray([
+    'font' => ['size' => 10],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+    'borders' => [
+        'allBorders' => [
+            'borderStyle' => Border::BORDER_THIN,
+            'color' => ['argb' => 'FFDDDDDD'],
+        ],
+    ]
+]);
+
+// --- 3. SECCIÓN: DETALLE DE RESERVAS ---
+// Fila 8: Título Sección Reservas
+$sheet->setCellValue('A8', 'Detalle de Reservas');
+$sheet->mergeCells('A8:H8');
+$sheet->getStyle('A8')->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'size' => 16,
+        'color' => ['argb' => 'FF' . $navy],
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_LEFT,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+]);
+$sheet->getRowDimension(8)->setRowHeight(25);
+
+// Fila 9: Encabezados de Tabla
+$tableHeaders = [
+    'A' => 'Habitación',
+    'B' => 'Tipo',
+    'C' => 'Entrada',
+    'D' => 'Salida',
+    'E' => 'Noches',
+    'F' => 'Personas',
+    'G' => 'Método de Pago',
+    'H' => 'Total'
 ];
 
-$total_general = 0;
-
-foreach ($reservas as $r) {
-    $data[] = [
-        'Habitación ' . $r['habitacion'],
-        $r['tipo'],
-        $style_info_val . $r['entrada'] . '</center>',
-        $style_info_val . $r['salida'] . '</center>',
-        $style_info_val . $r['noches'] . '</center>',
-        $style_info_val . $r['personas'] . '</center>',
-        $r['pago'],
-        $cell_money . '$' . number_format($r['total'], 0, ',', '.') . '</right>'
-    ];
-    $total_general += $r['total'];
+foreach ($tableHeaders as $col => $text) {
+    $sheet->setCellValue($col . '9', $text);
 }
 
-// Fila de Total General
-$data[] = [
-    null, null, null, null, null, null,
-    $style_total_label . 'TOTAL GENERAL:</right></b>',
-    $style_total_val . '$' . number_format($total_general, 0, ',', '.') . '</right></b>'
-];
+$sheet->getStyle('A9:H9')->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'color' => ['argb' => 'FF' . $gold],
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+    'fill' => [
+        'fillType' => Fill::FILL_SOLID,
+        'startColor' => ['argb' => 'FF' . $navy],
+    ],
+    'borders' => [
+        'allBorders' => [
+            'borderStyle' => Border::BORDER_THIN,
+            'color' => ['argb' => 'FF000000'],
+        ],
+    ]
+]);
 
-// Fila de Espacio
-$data[] = [null, null, null, null, null, null, null, null];
+// Filas de Datos
+$row = 10;
+$totalGeneral = 0;
 
-// Fila de Pie de página
-$data[] = [
-    $style_footer . '¡Gracias por elegir la elegancia y confort de Hotel Viña del Mar!</center></b>',
-    null, null, null, null, null, null, null
-];
+if (!empty($reservas)) {
+    foreach ($reservas as $r) {
+        $nombreHabitacion = stripos($r['habitacion'], 'Habitación') !== false 
+            ? $r['habitacion'] 
+            : $r['habitacion'];
+        $sheet->setCellValue('A' . $row, $nombreHabitacion);
+        
+        $sheet->setCellValue('B' . $row, $r['tipo']);
+        $sheet->setCellValue('C' . $row, $r['entrada']);
+        $sheet->setCellValue('D' . $row, $r['salida']);
+        $sheet->setCellValue('E' . $row, $r['noches']);
+        $sheet->setCellValue('F' . $row, $r['personas']);
+        
+        $metodoPago = isset($r['pago']) ? ucfirst($r['pago']) : 'N/A';
+        $sheet->setCellValue('G' . $row, $metodoPago);
+        
+        $totalGeneral += $r['total'];
+        $sheet->setCellValue('H' . $row, '$' . number_format($r['total'], 2, ',', '.'));
+        
+        // Formato para la fila
+        $sheet->getStyle('A' . $row . ':H' . $row)->applyFromArray([
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ]
+        ]);
+        $row++;
+    }
+} else {
+    $sheet->setCellValue('A' . $row, 'No hay reservas registradas.');
+    $sheet->mergeCells('A' . $row . ':H' . $row);
+    $row++;
+}
 
-// Generar y descargar el archivo
-$xlsx = SimpleXLSXGen::fromArray($data);
+// Fila de TOTAL GENERAL
+$sheet->setCellValue('G' . $row, 'TOTAL GENERAL:');
+$sheet->setCellValue('H' . $row, '$' . number_format($totalGeneral, 2, ',', '.'));
 
-// Fusiones de celdas
-$xlsx->mergeCells('A1:H1'); // Título
-$xlsx->mergeCells('A2:H2'); // Subtítulo
-$last_row = count($data);
-$xlsx->mergeCells('A' . $last_row . ':H' . $last_row); // Footer
+$sheet->getStyle('G' . $row . ':H' . $row)->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'color' => ['argb' => 'FF' . $darkText],
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_RIGHT,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+    'fill' => [
+        'fillType' => Fill::FILL_SOLID,
+        'startColor' => ['argb' => 'FF' . $gold],
+    ],
+    'borders' => [
+        'allBorders' => [
+            'borderStyle' => Border::BORDER_THIN,
+            'color' => ['argb' => 'FF000000'],
+        ],
+    ]
+]);
+$sheet->getStyle('H' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-// Ajustar anchos de columna
-$xlsx->setColWidth(1, 20); // Habitación
-$xlsx->setColWidth(2, 15); // Tipo
-$xlsx->setColWidth(3, 20); // Entrada
-$xlsx->setColWidth(4, 20); // Salida
-$xlsx->setColWidth(5, 10); // Noches
-$xlsx->setColWidth(6, 10); // Personas
-$xlsx->setColWidth(7, 20); // Método de Pago
-$xlsx->setColWidth(8, 20); // Total
+// --- 4. PIE DE PÁGINA ---
+$row += 2;
+$sheet->setCellValue('A' . $row, '¡Gracias por elegir la elegancia y confort de Hotel Viña del Mar!');
+$sheet->mergeCells('A' . $row . ':H' . $row);
+$sheet->getStyle('A' . $row)->applyFromArray([
+    'font' => [
+        'size' => 11,
+        'bold' => true,
+        'color' => ['argb' => 'FF' . $darkText],
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+        'vertical' => Alignment::VERTICAL_CENTER,
+    ],
+    'fill' => [
+        'fillType' => Fill::FILL_SOLID,
+        'startColor' => ['argb' => 'FF' . $gold],
+    ],
+]);
 
-$xlsx->downloadAs('Reporte_General_Reservas_' . date('Ymd_His') . '.xlsx');
+// --- 5. AJUSTAR ANCHOS DE COLUMNA ---
+$sheet->getColumnDimension('A')->setWidth(25);
+$sheet->getColumnDimension('B')->setWidth(20);
+$sheet->getColumnDimension('C')->setWidth(20);
+$sheet->getColumnDimension('D')->setWidth(20);
+$sheet->getColumnDimension('E')->setWidth(15);
+$sheet->getColumnDimension('F')->setWidth(20);
+$sheet->getColumnDimension('G')->setWidth(18);
+$sheet->getColumnDimension('H')->setWidth(22);
+
+// --- 6. SALIDA ---
+if (ob_get_length()) {
+    ob_end_clean();
+}
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header('Content-Disposition: attachment;filename="Reporte_Reservas_General.xlsx"');
+header('Cache-Control: max-age=0');
+
+$writer = new Xlsx($spreadsheet);
+$writer->save('php://output');
 exit;

@@ -695,7 +695,7 @@ function generarReporte() {
   
   // Redirigir al generador de Excel
   setTimeout(() => {
-    window.location.href = "Reportes/reporteGeneral.php";
+    window.location.href = "index.php?action=descargarExcelReservas";
   }, 1000);
 }
 
