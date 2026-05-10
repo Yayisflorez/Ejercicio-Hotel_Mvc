@@ -113,11 +113,11 @@ document.addEventListener('DOMContentLoaded', function() {
               
               // Redirigir al terminar
               setTimeout(() => {
-                window.location.href = 'index.php?action=getFormLoginUser';
+                window.location.href = 'index.php?action=getFormLoginUser&send=sendEmail';
               }, 2000);
             } else {
               // Fallback si no existe el HTML de carga
-              window.location.href = 'index.php?action=getFormLoginUser';
+              window.location.href = 'index.php?action=getFormLoginUser&send=sendEmail';
             }
           } else if (data.status === 'error') {
             // Manejar errores del servidor

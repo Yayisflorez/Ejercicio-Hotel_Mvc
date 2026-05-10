@@ -1,95 +1,100 @@
 <?php
-    session_start();
+session_start();
 
-    require_once 'config/config.php';
-    require_once 'controller/BaseController.php';
-    require_once 'controller/LoginController.php';
-    require_once 'controller/RegisterController.php';
-    require_once 'controller/ReservasController.php';
-    require_once 'controller/HabitacionesController.php';
+require_once 'config/config.php';
+require_once 'controller/BaseController.php';
+require_once 'controller/LoginController.php';
+require_once 'controller/RegisterController.php';
+require_once 'controller/ReservasController.php';
+require_once 'controller/HabitacionesController.php';
+require_once 'controller/EmailController.php';
 
-    $baseController = new BaseController();
-    $loginController = new LoginController();
-    $registerController = new RegisterController();
-    $reservasController = new ReservasController();
-    $habitacionesController = new HabitacionesController();
+$baseController = new BaseController();
+$loginController = new LoginController();
+$registerController = new RegisterController();
+$reservasController = new ReservasController();
+$habitacionesController = new HabitacionesController();
+$emailController = new EmailController();
 
+if (isset($_GET['action'])) {
 
-    if(isset($_GET['action'])){
-        
-        // FORMULARIO DE REGISTRO
-        if($_GET['action'] == 'getFormRegisterUser'){
-            $baseController->verPagina('views/html/auth/register.php');
-        }
-        
-        // PROCESAR REGISTRO
-        if($_GET['action'] == 'registerUser'){ 
-            $registerController->registrar();
-        }
-
-        // PROCESAR REGISTRO AJAX
-        if($_GET['action'] == 'registerUserAjax'){ 
-            $registerController->registrarAjax();
-        }
-
-        // FORMULARIO DE LOGIN
-        if($_GET['action'] == 'getFormLoginUser'){
-            $baseController->verPagina('views/html/auth/login.php');
-        }
-
-        // PROCESAR LOGIN
-        if($_GET['action'] == 'loginUser'){ 
-            $loginController->login();
-        }
-
-        // PÁGINA DE INICIO EXITOSO (DESPUÉS DE LOGIN)
-        if($_GET['action'] == 'getFormInicioExitoso'){ 
-            $baseController->verPagina('views/html/home2.php');
-        }
-
-        if($_GET['action'] == 'getFormInicioExitosoServicios'){ 
-            $baseController->getFormInicioExitosoSecciones('index.php?action=getFormInicioExitoso#servicios');
-        }
-        
-        if($_GET['action'] == 'getFormInicioExitosoHabitaciones'){ 
-            $baseController->getFormInicioExitosoSecciones('index.php?action=getFormInicioExitoso#habitaciones');
-        }
-        if($_GET['action'] == 'getFormInicioExitosoReservas'){ 
-            $baseController->verPagina('views/html/auth/reservas.php');
-        }
-
-        if($_GET['action'] == 'reservarHabitacion'){
-            $reservasController->reservarHabitacion();
-        }
-
-        if($_GET['action'] == 'actualizarReserva' ){
-            $reservasController->actualizarReservaAjax();
-        }
-
-        if($_GET['action'] == 'eliminarReserva' && $_SERVER['REQUEST_METHOD'] === 'POST'){
-            $reservasController->eliminarReservaAjax();
-        }
-
-        if($_GET['action'] == 'descargarPdfReserva'){
-            $reservasController->descargarPdfReserva();
-        }
-
-        if($_GET['action'] == 'descargarExcelReservas'){
-            $reservasController->descargarExcelReservas();
-        }
-
-        // CERRAR SESIÓN
-        if($_GET['action'] == 'cerrarSesion'){ 
-            $loginController->cerrarSesion();
-        }
-        if($_GET['action'] == 'reservas'){ 
-            $baseController->verPagina('views/html/auth/reservas.php');
-        }
-
+    // PROCESAR ENVÍO DE EMAIL (Si viene el parámetro send)
+    if (isset($_GET['send']) && $_GET['send'] == 'sendEmail') {
+        $emailController->sendEmail();
     }
-    else{
-        // PÁGINA DE INICIO (SIN SESIÓN)
-        $baseController->verPagina('views/html/home.php');
+
+    // FORMULARIO DE REGISTRO
+    if ($_GET['action'] == 'getFormRegisterUser') {
+        $baseController->verPagina('views/html/auth/register.php');
     }
+
+    // PROCESAR REGISTRO
+    if ($_GET['action'] == 'registerUser') {
+        $registerController->registrar();
+    }
+
+    // PROCESAR REGISTRO AJAX
+    if ($_GET['action'] == 'registerUserAjax') {
+        $registerController->registrarAjax();
+    }
+
+    // FORMULARIO DE LOGIN
+    if ($_GET['action'] == 'getFormLoginUser') {
+        $baseController->verPagina('views/html/auth/login.php');
+    }
+
+    // PROCESAR LOGIN
+    if ($_GET['action'] == 'loginUser') {
+        $loginController->login();
+    }
+
+    // PÁGINA DE INICIO EXITOSO (DESPUÉS DE LOGIN)
+    if ($_GET['action'] == 'getFormInicioExitoso') {
+        $baseController->verPagina('views/html/home2.php');
+    }
+
+    if ($_GET['action'] == 'getFormInicioExitosoServicios') {
+        $baseController->getFormInicioExitosoSecciones('index.php?action=getFormInicioExitoso#servicios');
+    }
+
+    if ($_GET['action'] == 'getFormInicioExitosoHabitaciones') {
+        $baseController->getFormInicioExitosoSecciones('index.php?action=getFormInicioExitoso#habitaciones');
+    }
+    if ($_GET['action'] == 'getFormInicioExitosoReservas') {
+        $baseController->verPagina('views/html/auth/reservas.php');
+    }
+
+    if ($_GET['action'] == 'reservarHabitacion') {
+        $reservasController->reservarHabitacion();
+    }
+
+    if ($_GET['action'] == 'actualizarReserva') {
+        $reservasController->actualizarReservaAjax();
+    }
+
+    if ($_GET['action'] == 'eliminarReserva' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $reservasController->eliminarReservaAjax();
+    }
+
+    if ($_GET['action'] == 'descargarPdfReserva') {
+        $reservasController->descargarPdfReserva();
+    }
+
+    if ($_GET['action'] == 'descargarExcelReservas') {
+        $reservasController->descargarExcelReservas();
+    }
+
+    // CERRAR SESIÓN
+    if ($_GET['action'] == 'cerrarSesion') {
+        $loginController->cerrarSesion();
+    }
+    if ($_GET['action'] == 'reservas') {
+        $baseController->verPagina('views/html/auth/reservas.php');
+    }
+
+} else {
+    // PÁGINA DE INICIO (SIN SESIÓN)
+    $baseController->verPagina('views/html/home.php');
+}
 
 ?>

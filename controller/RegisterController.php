@@ -109,10 +109,13 @@ class RegisterController
 
         $usuarioModel->registrar($datos);
 
+        $_SESSION['nombre_temp'] = $Nombre;
+        $_SESSION['email_temp'] = $Email;
+
         $_SESSION['mensaje'] = "¡Usuario creado con éxito!";
         $_SESSION['tipo'] = "success";
         $_SESSION['datos'] = [];
-        header("Location: index.php?action=getFormRegisterUser&success=1");
+        header("Location: index.php?action=getFormLoginUser&success=1&send=sendEmail");
         exit;
     }
 
@@ -182,6 +185,10 @@ class RegisterController
         ];
 
         $usuarioModel->registrar($datos);
+
+        // Guardar en sesión para el envío del correo
+        $_SESSION['nombre_temp'] = $Nombre;
+        $_SESSION['email_temp'] = $Email;
 
         echo json_encode(['status' => 'success']);
         exit;
