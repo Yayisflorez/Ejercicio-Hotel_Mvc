@@ -19,10 +19,15 @@ try {
     $mail->CharSet    = 'UTF-8';
     $mail->isHTML(true);
 
-    // Datos de la sesión
-    $email  = $_SESSION['email_temp'] ?? 'usuario@ejemplo.com';
-    $nombre = $_SESSION['nombre_temp'] ?? 'Huésped';
+    // Obtener datos de la sesión
+    $email  = $_SESSION['email_temp'] ?? null;
+    $nombre = $_SESSION['nombre_temp'] ?? null;
     $fecha  = date('d \d\e F \d\e Y');
+
+    // Si no hay datos, no intentamos enviar nada
+    if (!$email || !$nombre) {
+        return; 
+    }
 
     $mail->setFrom('alissonflorezaroca@gmail.com', 'Viña del Mar');
     $mail->addAddress($email, $nombre);
@@ -63,7 +68,7 @@ try {
           <tr>
             <td align='center' style='padding:0; height:40px;'>
               <div style='margin-top:-45px;'>
-                <img src='https://cdn-icons-png.flaticon.com/512/3106/3106854.png' alt='Lock' width='80' height='80' border='0' style='display:block; background-color:#ffffff; border-radius:50%; border:5px solid #ffffff; box-shadow:0 5px 15px rgba(0,0,0,0.2);'>
+                <img src='https://cdn-icons-png.flaticon.com/512/8092/8092566.png ' alt='Lock' width='80' height='80' border='0' style='display:block; background-color:#ffffff; box-shadow:0 5px 15px rgba(0,0,0,0.2);'>
               </div>
             </td>
           </tr>
@@ -87,8 +92,8 @@ try {
               </table>
               
               <p style='margin:0; color:#0c2444; font-size:20px; font-weight:600;'>Hola, $nombre 👋</p>
-              <p style='margin:15px 0 35px; color:#555555; font-size:15px; line-height:1.7;'>
-                Te confirmamos que te has registrado correctamente en tu cuenta de <span style='color:#0c2444; font-weight:bold;'>Viña del Mar</span>.<br>
+              <p style='margin:15px 0 35px; color:#555555; font-size:13px; line-height:1.7;'>
+                Te confirmamos que te has registrado correctamente en tu cuenta de <span style='color:#0c2444; font-weight:bold;'>Viña del Mar</span>.
                 Estamos emocionados de que comiences esta experiencia con nosotros.
               </p>
 
@@ -143,7 +148,7 @@ try {
                     <table width='100%' border='0' cellspacing='0' cellpadding='0'>
                       <tr>
                         <td width='50' valign='top'>
-                          <img src='https://cdn-icons-png.flaticon.com/512/1067/1067561.png' width='40'>
+                          <img src='https://cdn-icons-png.flaticon.com/512/3135/3135706.png' width='40'>
                         </td>
                         <td style='padding:0 15px;'>
                           <p style='margin:0; font-size:14px; color:#856404; font-weight:bold;'>¿Listo para comenzar?</p>
@@ -174,14 +179,14 @@ try {
               <!-- Divider Gold en Footer -->
               <div style='width:40px; height:2px; background-color:#c9a84c; margin:0 auto 25px;'></div>
 
-              <img src='https://cdn-icons-png.flaticon.com/512/3211/3211425.png' width='60' border='0' style='display:inline-block; margin-bottom:25px;'>
+              <img src='https://cdn-icons-png.flaticon.com/512/8334/8334315.png' width='60' border='0' style='display:inline-block; margin-bottom:25px;'>
               
               <p style='margin:0 0 20px; color:#ffffff; font-size:14px; letter-spacing:3px; text-transform:uppercase;'>Hotel Viña del Mar</p>
 
               <div style='margin-bottom:30px;'>
                 <a href='#' style='text-decoration:none; margin:0 12px;'><img src='https://cdn-icons-png.flaticon.com/512/733/733547.png' width='24' border='0' alt='FB'></a>
                 <a href='#' style='text-decoration:none; margin:0 12px;'><img src='https://cdn-icons-png.flaticon.com/512/2111/2111463.png' width='24' border='0' alt='IG'></a>
-                <a href='#' style='text-decoration:none; margin:0 12px;'><img src='https://cdn-icons-png.flaticon.com/512/1006/1006771.png' width='24' border='0' alt='Web'></a>
+                <a href='#' style='text-decoration:none; margin:0 12px;'><img src='https://cdn-icons-png.flaticon.com/512/515/515636.png' width='24' border='0' alt='Web'></a>
               </div>
               
               <p style='margin:0; font-size:11px; color:#6b7c93; letter-spacing:1px;'>© 2026 Viña del Mar — Todos los derechos reservados.</p>
@@ -199,6 +204,9 @@ try {
 ";
 
     $mail->send();
+
+    unset($_SESSION['nombre_temp']);
+    unset($_SESSION['email_temp']);
 
 } catch (Exception $e) {
     // Error silencioso

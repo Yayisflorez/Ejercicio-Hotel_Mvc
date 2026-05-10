@@ -107,6 +107,9 @@ class RegisterController
             'password' => $Contraseña1
         ];
 
+        unset($_SESSION['nombre_temp']);
+        unset($_SESSION['email_temp']);
+
         $usuarioModel->registrar($datos);
 
         $_SESSION['nombre_temp'] = $Nombre;
@@ -186,9 +189,17 @@ class RegisterController
 
         $usuarioModel->registrar($datos);
 
-        // Guardar en sesión para el envío del correo
-        $_SESSION['nombre_temp'] = $Nombre;
+        // Limpiar sesión antes de asignar nuevos valores
+        unset($_SESSION['email_temp']);
+        unset($_SESSION['nombre_temp']);
+
         $_SESSION['email_temp'] = $Email;
+        $_SESSION['nombre_temp'] = $Nombre;
+
+        // Enviar email antes de responder (ya que estamos en AJAX)
+        require_once 'controller/EmailController.php';
+        $emailController = new EmailController();
+        $emailController->sendEmail();
 
         echo json_encode(['status' => 'success']);
         exit;

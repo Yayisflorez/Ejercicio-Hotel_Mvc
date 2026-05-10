@@ -92,7 +92,15 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault(); // Detener envío normal
 
         const formData = new FormData(regForm);
-        
+
+        // Mostrar pantalla de carga inmediatamente
+        const overlay = document.getElementById('loadingOverlay');
+        const fill = document.getElementById('loadingBarFill');
+        if (overlay && fill) {
+          overlay.classList.add('active');
+          fill.style.width = '30%';
+        }
+
         fetch('index.php?action=registerUserAjax', {
           method: 'POST',
           body: formData
@@ -100,26 +108,16 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
           if (data.status === 'success') {
-            // Mostrar pantalla de carga
-            const overlay = document.getElementById('loadingOverlay');
-            const fill = document.getElementById('loadingBarFill');
-            if (overlay && fill) {
-              overlay.classList.add('active');
-              
-              // Simular progreso de carga
-              setTimeout(() => { fill.style.width = '30%'; }, 200);
-              setTimeout(() => { fill.style.width = '60%'; }, 800);
-              setTimeout(() => { fill.style.width = '100%'; }, 1500);
-              
-              // Redirigir al terminar
-              setTimeout(() => {
-                window.location.href = 'index.php?action=getFormLoginUser&send=sendEmail';
-              }, 2000);
-            } else {
-              // Fallback si no existe el HTML de carga
-              window.location.href = 'index.php?action=getFormLoginUser&send=sendEmail';
-            }
+            if (fill) fill.style.width = '100%';
+            
+            // Redirigir al terminar la animación
+            setTimeout(() => {
+              window.location.href = 'index.php?action=getFormLoginUser&success=1';
+            }, 1000);
           } else if (data.status === 'error') {
+            // Ocultar pantalla de carga si hay error para mostrar los errores
+            if (overlay) overlay.classList.remove('active');
+            
             // Manejar errores del servidor
             for (let field in data.errors) {
               let errorEl = null;
