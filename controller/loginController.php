@@ -33,6 +33,14 @@ class LoginController
 
             $_SESSION['usuario'] = $usuario;
 
+            // ── Enviar correo de notificación de inicio de sesión ─────
+            require_once 'controller/EmailLoginController.php';
+            $emailLoginCtrl = new EmailLoginController();
+            $emailLoginCtrl->sendEmailLogin(
+                $usuario['email'],
+                $usuario['nombre'] . ' ' . $usuario['apellido']
+            );
+
             header("Location: index.php?action=getFormInicioExitoso");
             exit;
 

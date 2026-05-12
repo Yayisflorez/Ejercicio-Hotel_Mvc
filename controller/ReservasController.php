@@ -1,6 +1,7 @@
 <?php
 require_once 'model/Reserva.php';
 require_once 'model/Usuario.php';
+require_once 'model/Habitacion.php';
 
 class ReservasController {
     public static function obtenerReservasPorUsuario($id_user) {
@@ -38,9 +39,43 @@ class ReservasController {
             'precio' => $precio,
             'id_metodo_pago' => $id_metodo_pago
         ];
-        $ok = self::guardarReserva($data);
-        if ($ok) {
+        $insertId = self::guardarReserva($data);
+        if ($insertId) {
             $_SESSION['success'] = 'Reserva realizada correctamente';
+
+            // ── Enviar correo de confirmación ──────────────────────────
+            $usuarioModel = new Usuario();
+            $usuario      = $usuarioModel->obtenerPorId($id_user);
+
+            if ($usuario) {
+                $noches = (int) ((strtotime($fecha_final) - strtotime($fecha_inicio)) / 86400);
+                $pagoMap = [1 => 'nequi', 2 => 'daviplata', 3 => 'bancolombia'];
+
+                $habitacionInfo = Habitacion::obtenerPorId($id_habitacion);
+                $resEmailHabitacion = $habitacionInfo['num_habitacion'] ?? $id_habitacion;
+                $resEmailTipo       = $habitacionInfo['categoria_nombre'] ?? '';
+                $resEmailDesc       = $habitacionInfo['descripcion'] ?? '';
+
+                $reservaEmail = [
+                    'id'          => $insertId,
+                    'habitacion'  => $resEmailHabitacion,
+                    'tipo'        => $resEmailTipo,
+                    'descripcion' => $resEmailDesc,
+                    'entrada'     => $fecha_inicio,
+                    'salida'      => $fecha_final,
+                    'noches'      => $noches,
+                    'personas'    => $num_personas,
+                    'pago'        => $pagoMap[$id_metodo_pago] ?? 'N/A',
+                    'total'       => $precio,
+                    'created_at'  => date('Y-m-d H:i:s'),
+                ];
+
+                require_once 'controller/EmailReservaController.php';
+                $emailReservaCtrl = new EmailReservaController();
+                $emailReservaCtrl->sendEmailReserva($reservaEmail, $usuario);
+            }
+            // ───────────────────────────────────────────────────────────
+
         } else {
             $_SESSION['errors']['reserva'] = 'Error al guardar la reserva';
         }

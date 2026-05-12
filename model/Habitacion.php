@@ -14,6 +14,23 @@ class Habitacion {
         $conexion->cerrar();
         return $habitaciones;
     }
+
+    public static function obtenerPorId($id) {
+        $conexion = new Conexion();
+        $conexion->conectar();
+        $sql = "SELECT h.*, c.nombre AS categoria_nombre 
+                FROM habitaciones h 
+                JOIN categorias c ON h.id_categoria = c.id 
+                WHERE h.id = ?";
+        $stmt = $conexion->getConexion()->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $habitacion = $result->fetch_assoc();
+        $stmt->close();
+        $conexion->cerrar();
+        return $habitacion;
+    }
 }
 /* ajax */
 if (isset($_GET['action']) && $_GET['action'] == 'getHabitacionesByCategoria') {

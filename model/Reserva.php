@@ -1,8 +1,10 @@
 <?php
 require_once 'conexion.php';
 
-class Reserva {
-    public static function obtenerReservasPorUsuario($id_user) {
+class Reserva
+{
+    public static function obtenerReservasPorUsuario($id_user)
+    {
         $conexion = new Conexion();
         $conexion->conectar();
         $sql = "SELECT 
@@ -35,19 +37,22 @@ class Reserva {
         return $reservas;
     }
 
-    public static function guardarReserva($data) {
+    public static function guardarReserva($data)
+    {
         $conexion = new Conexion();
         $conexion->conectar();
         $sql = "INSERT INTO reservas (id_user, id_habitacion, fecha_inicio, fecha_final, num_personas, estado, precio, id_metodo_pago, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
         $stmt = $conexion->getConexion()->prepare($sql);
         $stmt->bind_param("iissiiid", $data['id_user'], $data['id_habitacion'], $data['fecha_inicio'], $data['fecha_final'], $data['num_personas'], $data['estado'], $data['precio'], $data['id_metodo_pago']);
         $ok = $stmt->execute();
+        $insertId = $ok ? $conexion->getConexion()->insert_id : 0;
         $stmt->close();
         $conexion->cerrar();
-        return $ok;
+        return $insertId; // retorna el ID insertado, o 0 si falló
     }
 
-    public static function actualizarReserva($data) {
+    public static function actualizarReserva($data)
+    {
         $conexion = new Conexion();
         $conexion->conectar();
         $sql = "UPDATE reservas SET id_habitacion = ?, precio = ?, fecha_inicio = ?, fecha_final = ?, num_personas = ?, id_metodo_pago = ?, updated_at = NOW() WHERE id = ?";
@@ -59,7 +64,8 @@ class Reserva {
         return $ok;
     }
 
-    public static function eliminarReserva($id) {
+    public static function eliminarReserva($id)
+    {
         $conexion = new Conexion();
         $conexion->conectar();
         $sql = "DELETE FROM reservas WHERE id = ?";
